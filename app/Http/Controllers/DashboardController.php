@@ -4,14 +4,16 @@ namespace App\Http\Controllers;
 
 use App\Models\Attendance;
 use App\Models\Member;
+use Illuminate\Support\Carbon;
 
 class DashboardController extends Controller
 {
     public function index()
     {
         $totalJemaat = Member::count();
-        $aktif = Member::where('status', 'aktif')->count();
-        $tidakAktif = $totalJemaat - $aktif;
+        $jemaatBaru = Member::where('created_at', '>=', now()->subMonth())->count();
+        $lakiLaki = Member::where('jenis_kelamin', 'L')->count();
+        $perempuan = Member::where('jenis_kelamin', 'P')->count();
 
         $monthlyGrowth = Member::query()
             ->get(['created_at'])
@@ -30,12 +32,38 @@ class DashboardController extends Controller
             })
             ->values();
 
+        $demografi = [
+            'Anak (<18)' => 0,
+            'Dewasa (18-59)' => 0,
+            'Lansia (60+)' => 0,
+        ];
+
+        Member::query()->pluck('tanggal_lahir')->each(function ($tanggalLahir) use (&$demografi) {
+            $usia = Carbon::parse($tanggalLahir)->age;
+
+            if ($usia < 18) {
+                $demografi['Anak (<18)']++;
+            } elseif ($usia < 60) {
+                $demografi['Dewasa (18-59)']++;
+            } else {
+                $demografi['Lansia (60+)']++;
+            }
+        });
+
+        $recentMembers = Member::query()
+            ->latest()
+            ->limit(5)
+            ->get(['nama', 'kontak', 'jenis_kelamin', 'status', 'created_at']);
+
         return view('dashboard.index', compact(
             'totalJemaat',
-            'aktif',
-            'tidakAktif',
+            'jemaatBaru',
+            'lakiLaki',
+            'perempuan',
             'monthlyGrowth',
-            'attendanceStats'
+            'attendanceStats',
+            'demografi',
+            'recentMembers'
         ));
     }
 }
