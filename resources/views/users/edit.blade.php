@@ -5,8 +5,10 @@
     @csrf @method('PUT')
     <input class="rounded border px-3 py-2" name="name" value="{{ $user->name }}" required>
     <input class="rounded border px-3 py-2" name="email" type="email" value="{{ $user->email }}" required>
-    <select name="role" class="rounded border px-3 py-2" required>
-        <option value="admin" @selected($user->role==='admin')>Admin</option><option value="pendeta" @selected($user->role==='pendeta')>Pendeta</option><option value="koordinator" @selected($user->role==='koordinator')>Koordinator</option><option value="user" @selected($user->role==='user')>User Biasa</option>
+    <select name="role_id" class="rounded border px-3 py-2" required>
+        @foreach($roles as $role)
+            <option value="{{ $role->id }}" @selected($user->role_id === $role->id)>{{ $role->name }}</option>
+        @endforeach
     </select>
     <input class="rounded border px-3 py-2" name="password" type="password" placeholder="Password baru (opsional)">
     <input class="rounded border px-3 py-2" name="password_confirmation" type="password" placeholder="Konfirmasi password baru">

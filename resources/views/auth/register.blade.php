@@ -6,11 +6,7 @@
         @csrf
         <input type="text" name="name" value="{{ old('name') }}" placeholder="Nama" class="w-full rounded border px-3 py-2" required>
         <input type="email" name="email" value="{{ old('email') }}" placeholder="Email" class="w-full rounded border px-3 py-2" required>
-        <select name="role" class="w-full rounded border px-3 py-2" required>
-            @foreach(['admin' => 'Admin','pendeta' => 'Pendeta','koordinator' => 'Koordinator','user' => 'User Biasa'] as $value => $label)
-                <option value="{{ $value }}">{{ $label }}</option>
-            @endforeach
-        </select>
+        <input type="text" value="Member" class="w-full rounded border bg-slate-50 px-3 py-2 text-slate-500" disabled>
         <input type="password" name="password" placeholder="Password" class="w-full rounded border px-3 py-2" required>
         <input type="password" name="password_confirmation" placeholder="Konfirmasi Password" class="w-full rounded border px-3 py-2" required>
         <button class="rounded bg-slate-900 px-3 py-2 text-white">Daftar</button>

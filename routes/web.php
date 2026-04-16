@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,23 +22,37 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->middleware('permission:view_dashboard')
+        ->name('dashboard');
 
     Route::resource('members', MemberController::class);
-    Route::post('/members/import', [MemberController::class, 'import'])->name('members.import');
-    Route::get('/members-export/excel', [MemberController::class, 'exportExcel'])->name('members.export.excel');
-    Route::get('/members-export/pdf', [MemberController::class, 'exportPdf'])->name('members.export.pdf');
+    Route::post('/members/import', [MemberController::class, 'import'])
+        ->middleware('permission:import_members')
+        ->name('members.import');
+    Route::get('/members-export/excel', [MemberController::class, 'exportExcel'])
+        ->middleware('permission:export_members')
+        ->name('members.export.excel');
+    Route::get('/members-export/pdf', [MemberController::class, 'exportPdf'])
+        ->middleware('permission:export_members')
+        ->name('members.export.pdf');
+
+    Route::get('/categories', [CategoryController::class, 'index'])
+        ->middleware('permission:view_categories')
+        ->name('categories.index');
 
     Route::resource('attendances', AttendanceController::class)->except(['show']);
     Route::view('/notifications', 'notifications.index')->name('notifications.index');
-    Route::view('/settings', 'settings.index')->name('settings.index');
+    Route::view('/settings', 'settings.index')
+        ->middleware('permission:view_settings')
+        ->name('settings.index');
 
-    Route::middleware('role:admin,pendeta,koordinator')->group(function () {
-        Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
-        Route::get('/reports/export-pdf', [ReportController::class, 'exportPdf'])->name('reports.export.pdf');
-    });
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/export-pdf', [ReportController::class, 'exportPdf'])->name('reports.export.pdf');
 
-    Route::middleware('role:admin')->group(function () {
-        Route::resource('users', UserController::class)->except(['show']);
-    });
+    Route::resource('users', UserController::class)->except(['show']);
+
+    Route::get('/roles', [RoleController::class, 'index'])
+        ->middleware(['role:Admin', 'permission:assign_roles'])
+        ->name('roles.index');
 });

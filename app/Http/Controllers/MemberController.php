@@ -12,6 +12,16 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class MemberController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view_members')->only(['index', 'show']);
+        $this->middleware('permission:create_members')->only(['create', 'store']);
+        $this->middleware('permission:edit_members')->only(['edit', 'update']);
+        $this->middleware('permission:delete_members')->only(['destroy']);
+        $this->middleware('permission:export_members')->only(['exportExcel', 'exportPdf']);
+        $this->middleware('permission:import_members')->only(['import']);
+    }
+
     public function index(Request $request)
     {
         $wilayahField = collect(['wilayah', 'kelompok'])
@@ -131,7 +141,7 @@ class MemberController extends Controller
             'file' => ['required', 'file', 'mimes:xlsx,csv,xls'],
         ]);
 
-        Excel::import(new MembersImport(), $request->file('file'));
+        Excel::import(new MembersImport, $request->file('file'));
 
         return back()->with('success', 'Import data jemaat berhasil.');
     }

@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Attendance;
 use App\Models\Member;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -12,12 +13,20 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        $this->call([
+            PermissionSeeder::class,
+            RoleSeeder::class,
+        ]);
+
+        $adminRoleId = Role::query()->where('name', 'Admin')->value('id');
+
         User::query()->updateOrCreate(
             ['email' => 'admin@gereja.local'],
             [
                 'name' => 'Admin Gereja',
                 'password' => Hash::make('Admin123!'),
                 'role' => 'admin',
+                'role_id' => $adminRoleId,
             ]
         );
 
