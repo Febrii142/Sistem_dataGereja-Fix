@@ -1,102 +1,88 @@
-# Sistem Informasi Manajemen & Pendataan Jemaat Gereja
+# Sistem Informasi Manajemen & Pendataan Jemaat Gereja (Laravel + Blade)
 
-Starter project full-stack untuk sistem manajemen jemaat gereja dengan arsitektur siap production dan mudah dikembangkan.
+Implementasi awal website manajemen dan pendataan jemaat gereja berbasis **Laravel 13 + Blade** dengan struktur siap pengembangan lanjut dan deployment.
 
-## Tech Stack
-- **Frontend**: React + TypeScript + Vite + Tailwind CSS
-- **Backend**: Node.js + Express + TypeScript
-- **Auth**: JWT + Role-based access control
-- **Data**: In-memory seed (siap dihubungkan ke MongoDB/PostgreSQL sesuai kebutuhan)
+## Fitur Utama (Implementasi Awal)
 
-## Fitur yang Sudah Diimplementasikan (Initial Solid Implementation)
-### 1) Dashboard Admin
-- Statistik jemaat (total, aktif, tidak aktif, rasio kehadiran)
-- Grafik pertumbuhan jemaat bulanan (Recharts)
-- Quick action cards
+1. **Dashboard Admin**
+   - Ringkasan statistik jemaat (total, aktif, tidak aktif)
+   - Grafik pertumbuhan jemaat bulanan
+   - Grafik rata-rata kehadiran
+   - Quick actions ke menu utama
 
-### 2) Manajemen Data Jemaat
-- Form input data jemaat (nama, alamat, kontak, status, tanggal lahir, jenis kelamin, pekerjaan)
-- Daftar jemaat + pencarian
-- Hapus data jemaat
-- Export data ke **Excel** dan **PDF**
-- Import data dari **CSV**
+2. **Manajemen Data Jemaat**
+   - CRUD data jemaat (nama, alamat, kontak, status, tanggal lahir, jenis kelamin, pekerjaan)
+   - Pencarian dan filter status
+   - Export Excel (`maatwebsite/excel`)
+   - Export PDF (`barryvdh/laravel-dompdf`)
+   - Import file Excel/CSV
 
-### 3) Manajemen Kehadiran
-- Pencatatan kehadiran ibadah
-- Daftar kehadiran per jemaat
-- Statistik endpoint kehadiran per jemaat
+3. **Manajemen Kehadiran**
+   - Input kehadiran ibadah
+   - Laporan kehadiran per jemaat
+   - Statistik hadir/tidak hadir
 
-### 4) User Management
-- Login/Register backend
-- RBAC role: `admin`, `pendeta`, `koordinator`, `user`
-- Update role user (halaman user management)
+4. **User Management & Auth**
+   - Login/Register berbasis session Laravel
+   - Role-based access control: `admin`, `pendeta`, `koordinator`, `user`
+   - Manajemen akun pengguna (khusus admin)
 
-### 5) Laporan & Analytics
-- Laporan demografis jemaat
-- Laporan pertumbuhan jemaat
-- Laporan kehadiran
-- Export laporan PDF
+5. **Laporan & Analytics**
+   - Laporan demografis jemaat
+   - Laporan pertumbuhan jemaat
+   - Laporan kehadiran
+   - Export laporan PDF
 
-## Struktur Folder
+## Struktur Folder Utama
 
 ```txt
-.
-├── backend/
-│   ├── src/
-│   │   ├── config/
-│   │   ├── middleware/
-│   │   ├── routes/
-│   │   ├── store/
-│   │   ├── tests/
-│   │   ├── app.ts
-│   │   └── server.ts
-│   ├── package.json
-│   └── tsconfig.json
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── lib/
-│   │   ├── pages/
-│   │   ├── tests/
-│   │   └── types/
-│   ├── package.json
-│   └── vite.config.ts
-├── .env.example
-└── package.json
+app/
+  Http/Controllers/
+  Http/Middleware/
+  Models/
+  Exports/
+  Imports/
+database/
+  migrations/
+  seeders/
+resources/views/
+  layouts/
+  auth/
+  dashboard/
+  members/
+  attendances/
+  users/
+  reports/
+routes/web.php
 ```
 
-## Menjalankan Proyek
+## Setup Lokal
 
-### 1. Install dependencies
-```bash
-npm install
-npm --prefix backend install
-npm --prefix frontend install
-```
+1. Install dependency:
+   ```bash
+   composer install
+   npm install
+   ```
+2. Copy env:
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+3. Atur koneksi MySQL di `.env`
+4. Migrasi + seed:
+   ```bash
+   php artisan migrate --seed
+   ```
+5. Jalankan aplikasi:
+   ```bash
+   composer run dev
+   ```
 
-### 2. Setup environment
-```bash
-cp .env.example .env
-```
+Akses: `http://127.0.0.1:8000`
 
-### 3. Jalankan backend + frontend bersamaan
-```bash
-npm run dev
-```
+## Akun Default Seeder
 
-- Frontend: `http://localhost:5173`
-- Backend: `http://localhost:4000`
-
-## Akun Default
 - Email: `admin@gereja.local`
 - Password: `Admin123!`
+- Role: `admin`
 
-## Scripts
-- Root: `npm run dev`, `npm run build`, `npm run test`
-- Backend: `npm run dev`, `npm run build`, `npm run test`
-- Frontend: `npm run dev`, `npm run build`, `npm run test`, `npm run lint`
-
-## Catatan Pengembangan Lanjutan
-- Ganti in-memory store dengan MongoDB/PostgreSQL persistence layer.
-- Tambahkan refresh token, audit log, dan hardening security untuk production.
-- Tambahkan pagination server-side dan filtering lanjutan.
