@@ -17,7 +17,7 @@
 
 <form method="get" class="mb-4 grid gap-3 rounded-xl bg-white p-4 shadow-sm md:grid-cols-5">
     <select class="rounded-lg border border-slate-200 px-3 py-2 text-sm" name="status">
-        <option value="">Filter</option>
+        <option value="">Filter Status</option>
         @foreach($statusOptions as $statusValue => $statusLabel)
             <option value="{{ $statusValue }}" @selected(request('status') === $statusValue)>{{ $statusLabel }}</option>
         @endforeach
@@ -102,7 +102,7 @@
                         <form action="{{ route('members.destroy',$member) }}" method="post" class="inline">
                             @csrf
                             @method('DELETE')
-                            <button class="rounded-lg border border-rose-200 px-3 py-1.5 text-xs font-medium text-rose-700 hover:bg-rose-50" onclick="return confirm('Hapus data?')">Delete</button>
+                            <button class="rounded-lg border border-rose-200 px-3 py-1.5 text-xs font-medium text-rose-700 hover:bg-rose-50" onclick="return confirm('Hapus data?')">Hapus</button>
                         </form>
                     </div>
                 </td>
