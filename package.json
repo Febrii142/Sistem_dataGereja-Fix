@@ -1,27 +1,16 @@
 {
-  "name": "sistem_datagereja-fix",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "npm --prefix backend run test && npm --prefix frontend run test",
-    "dev": "concurrently \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\"",
-    "build": "npm --prefix backend run build && npm --prefix frontend run build"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Febrii142/Sistem_dataGereja-Fix.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/Febrii142/Sistem_dataGereja-Fix/issues"
-  },
-  "homepage": "https://github.com/Febrii142/Sistem_dataGereja-Fix#readme",
-  "devDependencies": {
-    "concurrently": "^9.2.1"
-  },
-  "private": true
+    "$schema": "https://www.schemastore.org/package.json",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite"
+    },
+    "devDependencies": {
+        "@tailwindcss/vite": "^4.0.0",
+        "concurrently": "^9.0.1",
+        "laravel-vite-plugin": "^3.0.0",
+        "tailwindcss": "^4.0.0",
+        "vite": "^8.0.0"
+    }
 }
