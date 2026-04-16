@@ -8,9 +8,12 @@ use Maatwebsite\Excel\Concerns\WithHeadings;
 
 class MembersExport implements FromCollection, WithHeadings
 {
+    public function __construct(private array $filters = []) {}
+
     public function collection()
     {
         return Member::query()
+            ->filterCategories($this->filters)
             ->select(['nama', 'alamat', 'kontak', 'status', 'tanggal_lahir', 'jenis_kelamin', 'pekerjaan'])
             ->orderBy('nama')
             ->get();
