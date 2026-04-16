@@ -7,23 +7,42 @@ use App\Imports\MembersImport;
 use App\Models\Member;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Maatwebsite\Excel\Facades\Excel;
 
 class MemberController extends Controller
 {
     public function index(Request $request)
     {
+        $wilayahField = collect(['wilayah', 'kelompok'])
+            ->first(fn (string $column) => Schema::hasColumn('members', $column));
+
+        $filters = [
+            'search' => $request->string('search')->toString(),
+            'status' => $request->string('status')->toString(),
+            'gender' => $request->string('gender')->toString(),
+            'age_category' => $request->string('age_category')->toString(),
+            'wilayah' => $request->string('wilayah')->toString(),
+            'wilayah_field' => $wilayahField,
+        ];
+
         $members = Member::query()
-            ->when($request->filled('search'), function ($query) use ($request) {
-                $query->where('nama', 'like', '%'.$request->string('search').'%')
-                    ->orWhere('kontak', 'like', '%'.$request->string('search').'%');
-            })
-            ->when($request->filled('status'), fn ($query) => $query->where('status', $request->string('status')))
+            ->filterCategories($filters)
             ->latest()
             ->paginate(10)
             ->withQueryString();
 
-        return view('members.index', compact('members'));
+        $wilayahOptions = $wilayahField
+            ? Member::query()
+                ->whereNotNull($wilayahField)
+                ->where($wilayahField, '!=', '')
+                ->distinct()
+                ->orderBy($wilayahField)
+                ->pluck($wilayahField)
+                ->all()
+            : [];
+
+        return view('members.index', compact('members', 'wilayahField', 'wilayahOptions'));
     }
 
     public function create()
@@ -82,9 +101,19 @@ class MemberController extends Controller
         return back()->with('success', 'Data jemaat berhasil dihapus.');
     }
 
-    public function exportExcel()
+    public function exportExcel(Request $request)
     {
-        return Excel::download(new MembersExport(), 'data-jemaat.xlsx');
+        $wilayahField = collect(['wilayah', 'kelompok'])
+            ->first(fn (string $column) => Schema::hasColumn('members', $column));
+
+        return Excel::download(new MembersExport([
+            'search' => $request->string('search')->toString(),
+            'status' => $request->string('status')->toString(),
+            'gender' => $request->string('gender')->toString(),
+            'age_category' => $request->string('age_category')->toString(),
+            'wilayah' => $request->string('wilayah')->toString(),
+            'wilayah_field' => $wilayahField,
+        ]), 'data-jemaat.xlsx');
     }
 
     public function exportPdf()
