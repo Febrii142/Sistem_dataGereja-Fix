@@ -28,6 +28,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/members-export/pdf', [MemberController::class, 'exportPdf'])->name('members.export.pdf');
 
     Route::resource('attendances', AttendanceController::class)->except(['show']);
+    Route::view('/notifications', 'notifications.index')->name('notifications.index');
+    Route::view('/settings', 'settings.index')->name('settings.index');
 
     Route::middleware('role:admin,pendeta,koordinator')->group(function () {
         Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
