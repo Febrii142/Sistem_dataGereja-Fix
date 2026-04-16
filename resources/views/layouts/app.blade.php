@@ -32,7 +32,7 @@
                 @else
                     <span class="block cursor-not-allowed rounded-lg px-3 py-2 text-slate-200">Laporan</span>
                 @endif
-                <span class="block cursor-not-allowed rounded-lg px-3 py-2 text-slate-200">Settings</span>
+                <a href="{{ route('settings.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('settings.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Settings</a>
             </nav>
             <form action="{{ route('logout') }}" method="post" class="mt-auto pt-6">
                 @csrf
@@ -42,12 +42,19 @@
         <main class="flex min-h-screen flex-col">
             <header class="border-b border-slate-200 bg-white px-4 py-3 lg:px-8">
                 <div class="flex flex-wrap items-center justify-between gap-3">
-                    <label class="w-full max-w-lg">
-                        <span class="sr-only">Search</span>
-                        <input type="text" placeholder="Cari data jemaat..." class="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm focus:border-[#3b82f6] focus:outline-none">
-                    </label>
+                    <form class="w-full max-w-lg" method="get" action="{{ route('members.index') }}">
+                        <label>
+                            <span class="sr-only">Search</span>
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari data jemaat..." class="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm focus:border-[#3b82f6] focus:outline-none">
+                        </label>
+                    </form>
                     <div class="ml-auto flex items-center gap-3">
-                        <button type="button" class="rounded-full bg-slate-100 p-2 text-lg" aria-label="Notifikasi">🔔</button>
+                        <a href="{{ route('notifications.index') }}" class="rounded-full bg-slate-100 p-2 text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6]" aria-label="Notifikasi">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <path d="M10 2a4 4 0 00-4 4v1.38a3 3 0 01-.88 2.12L4.7 9.92A1 1 0 005.4 11.6H14.6a1 1 0 00.7-1.7l-.42-.42A3 3 0 0114 7.38V6a4 4 0 00-4-4z" />
+                                <path d="M7.5 13a2.5 2.5 0 005 0h-5z" />
+                            </svg>
+                        </a>
                         <div class="rounded-lg bg-slate-100 px-3 py-2 text-sm">
                             <p class="font-semibold">{{ auth()->user()->name }}</p>
                             <p class="text-xs text-slate-500">{{ ucfirst(auth()->user()->role) }}</p>

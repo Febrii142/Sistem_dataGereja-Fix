@@ -50,7 +50,7 @@
                 </td>
             </tr>
         @empty
-            <tr><td colspan="5" class="p-3 text-center text-slate-500">Belum ada data.</td></tr>
+            <tr><td colspan="5" class="p-3 text-center text-slate-500">Belum ada data jemaat.</td></tr>
         @endforelse
         </tbody>
     </table>

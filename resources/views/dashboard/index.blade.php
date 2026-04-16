@@ -70,6 +70,13 @@
 
 @push('scripts')
 <script>
+    function replaceChartWithFallback(canvas, message) {
+        const fallback = document.createElement('p');
+        fallback.className = 'text-sm text-slate-500';
+        fallback.textContent = message;
+        canvas.replaceWith(fallback);
+    }
+
     const demografiCtx = document.getElementById('demografiChart');
     if (demografiCtx && window.Chart) {
         new Chart(demografiCtx, {
@@ -98,6 +105,11 @@
                 }]
             }
         });
+    }
+
+    if (!window.Chart) {
+        if (demografiCtx) replaceChartWithFallback(demografiCtx, 'Grafik demografi tidak dapat dimuat. Pastikan Chart.js telah dimuat dengan benar.');
+        if (genderCtx) replaceChartWithFallback(genderCtx, 'Grafik gender tidak dapat dimuat. Pastikan Chart.js telah dimuat dengan benar.');
     }
 </script>
 @endpush

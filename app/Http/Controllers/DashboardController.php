@@ -38,8 +38,12 @@ class DashboardController extends Controller
             'Lansia (60+)' => 0,
         ];
 
-        Member::query()->pluck('tanggal_lahir')->each(function ($tanggalLahir) use (&$demografi) {
-            $usia = Carbon::parse($tanggalLahir)->age;
+        Member::query()->whereNotNull('tanggal_lahir')->select('tanggal_lahir')->cursor()->each(function ($member) use (&$demografi) {
+            try {
+                $usia = Carbon::parse($member->tanggal_lahir)->age;
+            } catch (\Throwable) {
+                return;
+            }
 
             if ($usia < 18) {
                 $demografi['Anak (<18)']++;
