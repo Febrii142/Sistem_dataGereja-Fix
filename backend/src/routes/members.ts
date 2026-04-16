@@ -14,7 +14,7 @@ const memberSchema = z.object({
   alamat: z.string().min(5),
   kontak: z.string().min(8),
   status: z.enum(['aktif', 'tidak_aktif']),
-  tanggalLahir: z.iso.date(),
+  tanggalLahir: z.string().date(),
   jenisKelamin: z.enum(['L', 'P']),
   pekerjaan: z.string().optional(),
 });

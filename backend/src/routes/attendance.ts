@@ -7,7 +7,7 @@ const router = Router();
 
 const schema = z.object({
   memberId: z.string().min(1),
-  date: z.iso.datetime(),
+  date: z.string().datetime(),
   serviceType: z.enum(['minggu', 'pemuda', 'doa']),
   hadir: z.boolean(),
   note: z.string().optional(),
