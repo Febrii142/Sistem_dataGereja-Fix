@@ -1,0 +1,27 @@
+{
+  "name": "sistem_datagereja-fix",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm --prefix backend run test && npm --prefix frontend run test",
+    "dev": "concurrently \"npm --prefix backend run dev\" \"npm --prefix frontend run dev\"",
+    "build": "npm --prefix backend run build && npm --prefix frontend run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Febrii142/Sistem_dataGereja-Fix.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Febrii142/Sistem_dataGereja-Fix/issues"
+  },
+  "homepage": "https://github.com/Febrii142/Sistem_dataGereja-Fix#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "private": true
+}
