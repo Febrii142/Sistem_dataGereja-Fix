@@ -30,7 +30,7 @@
                     <span>{{ $category->name }} ({{ ucfirst($category->type) }})</span>
                 </label>
             @empty
-                <p class="text-sm text-slate-500">Belum ada kategori. Tambahkan dari menu Kategori Jemaat.</p>
+                <p class="text-sm text-slate-500">Belum ada kategori. Tambahkan dari halaman Daftar Jemaat.</p>
             @endforelse
         </div>
     </div>

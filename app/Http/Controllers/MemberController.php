@@ -15,9 +15,20 @@ class MemberController extends Controller
     public function index(Request $request)
     {
         $categories = Category::query()->orderBy('type')->orderBy('name')->get(['id', 'name', 'type']);
+        $statusOptions = [
+            'aktif' => 'Aktif',
+            'pengurus' => 'Pengurus',
+            'proses_verifikasi' => 'Proses Verifikasi',
+            'pasif' => 'Pasif',
+            'tidak_aktif' => 'Tidak Aktif',
+        ];
+        $availableJoinYears = range((int) now()->year, (int) now()->year - 10);
+        $verificationQueueCount = Member::query()
+            ->where('status', 'proses_verifikasi')
+            ->count();
 
         $members = Member::query()
-            ->with('categories:id,name')
+            ->with('categories:id,name,type')
             ->when($request->filled('search'), function ($query) use ($request) {
                 $query->where(function ($subQuery) use ($request) {
                     $subQuery->where('nama', 'like', '%'.$request->string('search').'%')
@@ -26,11 +37,21 @@ class MemberController extends Controller
             })
             ->when($request->filled('status'), fn ($query) => $query->where('status', $request->string('status')))
             ->when($request->filled('category_id'), fn ($query) => $query->whereHas('categories', fn ($subQuery) => $subQuery->whereKey($request->integer('category_id'))))
+            ->when(
+                $request->filled('tahun_bergabung') && is_numeric($request->input('tahun_bergabung')),
+                fn ($query) => $query->whereYear('created_at', (int) $request->input('tahun_bergabung'))
+            )
             ->latest()
             ->paginate(10)
             ->withQueryString();
 
-        return view('members.index', compact('members', 'categories'));
+        return view('members.index', compact(
+            'members',
+            'categories',
+            'statusOptions',
+            'availableJoinYears',
+            'verificationQueueCount'
+        ));
     }
 
     public function create()
