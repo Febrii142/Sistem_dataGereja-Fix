@@ -21,6 +21,7 @@
             <nav class="space-y-2 text-sm">
                 <a href="{{ route('dashboard') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('dashboard') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Dashboard</a>
                 <a href="{{ route('members.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('members.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Jemaat</a>
+                <a href="{{ route('categories.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('categories.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Kategori Jemaat</a>
                 <a href="{{ route('attendances.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('attendances.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Kehadiran</a>
                 @if(auth()->user()->role === 'admin')
                     <a href="{{ route('users.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('users.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">User Management</a>

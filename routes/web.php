@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\ReportController;
@@ -26,6 +27,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/members/import', [MemberController::class, 'import'])->name('members.import');
     Route::get('/members-export/excel', [MemberController::class, 'exportExcel'])->name('members.export.excel');
     Route::get('/members-export/pdf', [MemberController::class, 'exportPdf'])->name('members.export.pdf');
+    Route::get('/categories/{category}/export/excel', [CategoryController::class, 'exportExcel'])->name('categories.export.excel');
+    Route::resource('categories', CategoryController::class);
 
     Route::resource('attendances', AttendanceController::class)->except(['show']);
     Route::view('/notifications', 'notifications.index')->name('notifications.index');

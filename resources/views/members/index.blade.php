@@ -18,6 +18,12 @@
         <option value="aktif" @selected(request('status') === 'aktif')>Aktif</option>
         <option value="tidak_aktif" @selected(request('status') === 'tidak_aktif')>Tidak Aktif</option>
     </select>
+    <select class="rounded-lg border border-slate-200 px-3 py-2" name="category_id">
+        <option value="">Semua Kategori</option>
+        @foreach($categories as $category)
+            <option value="{{ $category->id }}" @selected((string)request('category_id') === (string)$category->id)>{{ $category->name }} ({{ ucfirst($category->type) }})</option>
+        @endforeach
+    </select>
     <button class="rounded-lg bg-[#3b82f6] px-3 py-2 font-semibold text-white hover:bg-[#2563eb]">Filter</button>
 </form>
 <form method="post" enctype="multipart/form-data" action="{{ route('members.import') }}" class="mb-4 flex flex-wrap gap-2 rounded-xl bg-white p-4 shadow-sm">
@@ -33,6 +39,7 @@
             <th class="p-3 text-left font-semibold">Kontak</th>
             <th class="p-3 text-left font-semibold">Status</th>
             <th class="p-3 text-left font-semibold">Gender</th>
+            <th class="p-3 text-left font-semibold">Kategori</th>
             <th class="p-3"></th>
         </tr>
         </thead>
@@ -43,6 +50,15 @@
                 <td class="p-3">{{ $member->kontak }}</td>
                 <td class="p-3">{{ ucfirst(str_replace('_', ' ', $member->status)) }}</td>
                 <td class="p-3">{{ $member->jenis_kelamin === 'L' ? 'L' : 'P' }}</td>
+                <td class="p-3">
+                    <div class="flex flex-wrap gap-1">
+                        @forelse($member->categories as $category)
+                            <span class="rounded bg-slate-100 px-2 py-1 text-xs text-slate-700">{{ $category->name }}</span>
+                        @empty
+                            <span class="text-xs text-slate-400">-</span>
+                        @endforelse
+                    </div>
+                </td>
                 <td class="p-3 text-right">
                     <a class="text-[#2563eb]" href="{{ route('members.show',$member) }}">Detail</a> |
                     <a class="text-amber-600" href="{{ route('members.edit',$member) }}">Edit</a> |
@@ -50,7 +66,7 @@
                 </td>
             </tr>
         @empty
-            <tr><td colspan="5" class="p-3 text-center text-slate-500">Belum ada data jemaat.</td></tr>
+            <tr><td colspan="6" class="p-3 text-center text-slate-500">Belum ada data jemaat.</td></tr>
         @endforelse
         </tbody>
     </table>
