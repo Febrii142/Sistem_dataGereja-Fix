@@ -20,4 +20,9 @@ class Member extends Model
     {
         return $this->hasMany(Attendance::class);
     }
+
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class, 'jemaat_categories');
+    }
 }

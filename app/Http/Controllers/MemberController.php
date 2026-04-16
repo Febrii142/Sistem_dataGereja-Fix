@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exports\MembersExport;
 use App\Imports\MembersImport;
+use App\Models\Category;
 use App\Models\Member;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -13,22 +14,51 @@ class MemberController extends Controller
 {
     public function index(Request $request)
     {
+        $categories = Category::query()->orderBy('type')->orderBy('name')->get(['id', 'name', 'type']);
+        $statusOptions = [
+            'aktif' => 'Aktif',
+            'pengurus' => 'Pengurus',
+            'proses_verifikasi' => 'Proses Verifikasi',
+            'pasif' => 'Pasif',
+            'tidak_aktif' => 'Tidak Aktif',
+        ];
+        $availableJoinYears = range((int) now()->year, (int) now()->year - 10);
+        $verificationQueueCount = Member::query()
+            ->where('status', 'proses_verifikasi')
+            ->count();
+
         $members = Member::query()
+            ->with('categories:id,name,type')
             ->when($request->filled('search'), function ($query) use ($request) {
-                $query->where('nama', 'like', '%'.$request->string('search').'%')
-                    ->orWhere('kontak', 'like', '%'.$request->string('search').'%');
+                $query->where(function ($subQuery) use ($request) {
+                    $subQuery->where('nama', 'like', '%'.$request->string('search').'%')
+                        ->orWhere('kontak', 'like', '%'.$request->string('search').'%');
+                });
             })
             ->when($request->filled('status'), fn ($query) => $query->where('status', $request->string('status')))
+            ->when($request->filled('category_id'), fn ($query) => $query->whereHas('categories', fn ($subQuery) => $subQuery->whereKey($request->integer('category_id'))))
+            ->when(
+                $request->filled('tahun_bergabung') && is_numeric($request->input('tahun_bergabung')),
+                fn ($query) => $query->whereYear('created_at', (int) $request->input('tahun_bergabung'))
+            )
             ->latest()
             ->paginate(10)
             ->withQueryString();
 
-        return view('members.index', compact('members'));
+        return view('members.index', compact(
+            'members',
+            'categories',
+            'statusOptions',
+            'availableJoinYears',
+            'verificationQueueCount'
+        ));
     }
 
     public function create()
     {
-        return view('members.create');
+        $categories = Category::query()->orderBy('type')->orderBy('name')->get(['id', 'name', 'type']);
+
+        return view('members.create', compact('categories'));
     }
 
     public function store(Request $request)
@@ -41,21 +71,29 @@ class MemberController extends Controller
             'tanggal_lahir' => ['required', 'date'],
             'jenis_kelamin' => ['required', 'in:L,P'],
             'pekerjaan' => ['nullable', 'string', 'max:255'],
+            'category_ids' => ['nullable', 'array'],
+            'category_ids.*' => ['integer', 'exists:categories,id'],
         ]);
 
-        Member::create($data);
+        $member = Member::create(collect($data)->except('category_ids')->all());
+        $member->categories()->sync($data['category_ids'] ?? []);
 
         return redirect()->route('members.index')->with('success', 'Data jemaat berhasil ditambahkan.');
     }
 
     public function show(Member $member)
     {
+        $member->load('categories:id,name,type');
+
         return view('members.show', compact('member'));
     }
 
     public function edit(Member $member)
     {
-        return view('members.edit', compact('member'));
+        $categories = Category::query()->orderBy('type')->orderBy('name')->get(['id', 'name', 'type']);
+        $member->load('categories:id');
+
+        return view('members.edit', compact('member', 'categories'));
     }
 
     public function update(Request $request, Member $member)
@@ -68,9 +106,12 @@ class MemberController extends Controller
             'tanggal_lahir' => ['required', 'date'],
             'jenis_kelamin' => ['required', 'in:L,P'],
             'pekerjaan' => ['nullable', 'string', 'max:255'],
+            'category_ids' => ['nullable', 'array'],
+            'category_ids.*' => ['integer', 'exists:categories,id'],
         ]);
 
-        $member->update($data);
+        $member->update(collect($data)->except('category_ids')->all());
+        $member->categories()->sync($data['category_ids'] ?? []);
 
         return redirect()->route('members.index')->with('success', 'Data jemaat berhasil diperbarui.');
     }

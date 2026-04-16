@@ -7,5 +7,12 @@
     <p><strong>Kontak:</strong> {{ $member->kontak }}</p>
     <p><strong>Status:</strong> {{ $member->status }}</p>
     <p><strong>Tanggal Lahir:</strong> {{ $member->tanggal_lahir }}</p>
+    <p><strong>Kategori:</strong>
+        @forelse($member->categories as $category)
+            <span class="mr-1 inline-block rounded bg-slate-100 px-2 py-1 text-xs">{{ $category->name }}</span>
+        @empty
+            -
+        @endforelse
+    </p>
 </div>
 @endsection

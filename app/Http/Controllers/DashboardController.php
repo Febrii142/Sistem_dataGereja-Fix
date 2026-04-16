@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Attendance;
+use App\Models\Category;
 use App\Models\Member;
 use Illuminate\Support\Carbon;
 
@@ -59,6 +60,12 @@ class DashboardController extends Controller
             ->limit(5)
             ->get(['nama', 'kontak', 'jenis_kelamin', 'status', 'created_at']);
 
+        $categoryStats = Category::query()
+            ->withCount('members')
+            ->orderBy('type')
+            ->orderBy('name')
+            ->get(['id', 'name', 'type']);
+
         return view('dashboard.index', compact(
             'totalJemaat',
             'jemaatBaru',
@@ -67,7 +74,8 @@ class DashboardController extends Controller
             'monthlyGrowth',
             'attendanceStats',
             'demografi',
-            'recentMembers'
+            'recentMembers',
+            'categoryStats'
         ));
     }
 }

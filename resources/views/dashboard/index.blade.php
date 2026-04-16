@@ -36,6 +36,11 @@
 </div>
 
 <div class="mt-6 rounded-xl bg-white p-5 shadow-sm">
+    <h3 class="mb-4 font-semibold text-slate-800">Jumlah Jemaat per Kategori</h3>
+    <canvas id="categoryChart" height="90"></canvas>
+</div>
+
+<div class="mt-6 rounded-xl bg-white p-5 shadow-sm">
     <h3 class="mb-4 font-semibold text-slate-800">Pendaftaran Terbaru</h3>
     <div class="overflow-x-auto">
         <table class="min-w-full text-sm">
@@ -107,9 +112,30 @@
         });
     }
 
+    const categoryCtx = document.getElementById('categoryChart');
+    if (categoryCtx && window.Chart) {
+        new Chart(categoryCtx, {
+            type: 'bar',
+            data: {
+                labels: @json($categoryStats->pluck('name')),
+                datasets: [{
+                    label: 'Jumlah Jemaat',
+                    data: @json($categoryStats->pluck('members_count')),
+                    backgroundColor: '#2563eb',
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    }
+
     if (!window.Chart) {
         if (demografiCtx) replaceChartWithFallback(demografiCtx, 'Grafik demografi tidak dapat dimuat. Pastikan Chart.js telah dimuat dengan benar.');
         if (genderCtx) replaceChartWithFallback(genderCtx, 'Grafik gender tidak dapat dimuat. Pastikan Chart.js telah dimuat dengan benar.');
+        if (categoryCtx) replaceChartWithFallback(categoryCtx, 'Grafik kategori tidak dapat dimuat. Pastikan Chart.js telah dimuat dengan benar.');
     }
 </script>
 @endpush

@@ -3,15 +3,19 @@
 namespace Database\Seeders;
 
 use App\Models\Attendance;
+use App\Models\Category;
 use App\Models\Member;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        $this->call(CategorySeeder::class);
+
         User::query()->updateOrCreate(
             ['email' => 'admin@gereja.local'],
             [
@@ -52,5 +56,41 @@ class DatabaseSeeder extends Seeder
                 ]);
             });
         }
+
+        $ageCategories = Category::query()
+            ->where('type', 'umur')
+            ->orderBy('min_age')
+            ->get();
+        $statusCategories = Category::query()
+            ->where('type', 'status')
+            ->get()
+            ->keyBy(fn (Category $category) => strtolower($category->name));
+
+        Member::query()->get()->each(function (Member $member) use ($ageCategories, $statusCategories) {
+            $categoryIds = [];
+
+            if ($member->tanggal_lahir) {
+                $usia = Carbon::parse($member->tanggal_lahir)->age;
+                $ageCategory = $ageCategories->first(function (Category $category) use ($usia) {
+                    $minAge = $category->min_age ?? 0;
+                    $maxAge = $category->max_age;
+
+                    return $usia >= $minAge && ($maxAge === null || $usia <= $maxAge);
+                });
+
+                if ($ageCategory) {
+                    $categoryIds[] = $ageCategory->id;
+                }
+            }
+
+            $statusKey = $member->status === 'aktif' ? 'aktif' : 'non-aktif';
+            if ($statusCategories->has($statusKey)) {
+                $categoryIds[] = $statusCategories->get($statusKey)->id;
+            }
+
+            if ($categoryIds !== []) {
+                $member->categories()->syncWithoutDetaching(array_unique($categoryIds));
+            }
+        });
     }
 }
