@@ -3,9 +3,11 @@
 namespace Database\Seeders;
 
 use App\Models\Attendance;
+use App\Models\Jemaat;
 use App\Models\Member;
 use App\Models\Role;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -16,6 +18,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             PermissionSeeder::class,
             RoleSeeder::class,
+            CategorySeeder::class,
         ]);
 
         $adminRoleId = Role::query()->where('name', 'Admin')->value('id');
@@ -72,6 +75,37 @@ class DatabaseSeeder extends Seeder
                     'keterangan' => 'Ibadah Minggu',
                 ]);
             });
+        }
+
+        if (Jemaat::count() === 0) {
+            $sampleJemaat = Jemaat::query()->create([
+                'user_id' => User::query()->where('email', 'jemaat@gereja.local')->value('id'),
+                'nama_lengkap' => 'Samuel Panjaitan',
+                'tempat_lahir' => 'Medan',
+                'tanggal_lahir' => '1992-04-12',
+                'alamat' => 'Jl. Sukacita No. 9',
+                'kota' => 'Medan',
+                'kode_pos' => '20111',
+                'no_telepon' => '081355501234',
+                'email' => 'samuel.panjaitan@gereja.local',
+                'status_perkawinan' => 'Menikah',
+                'kategori_jemaat' => 'Dewasa',
+                'status_baptis' => 'sudah',
+                'tanggal_baptis' => '2008-07-20',
+            ]);
+
+            $categoryIds = DB::table('categories')
+                ->whereIn('name', ['Dewasa', 'Menikah', 'Medan'])
+                ->pluck('id');
+
+            foreach ($categoryIds as $categoryId) {
+                DB::table('jemaat_categories')->insert([
+                    'jemaat_id' => $sampleJemaat->id,
+                    'category_id' => $categoryId,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
         }
     }
 }
