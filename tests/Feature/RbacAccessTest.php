@@ -50,9 +50,13 @@ class RbacAccessTest extends TestCase
     public function test_member_only_has_dashboard_access_from_rbac_protected_routes(): void
     {
         $member = $this->createUserWithRole('Jemaat Gereja');
+        $admin = $this->createUserWithRole('Admin');
 
         $this->actingAs($member)->get(route('jemaat.dashboard'))->assertOk();
+        $this->actingAs($member)->get('/jemaat/profile')->assertOk();
+        $this->actingAs($member)->get('/jemaat/family')->assertOk();
         $this->actingAs($member)->get(route('members.index'))->assertForbidden();
         $this->actingAs($member)->get(route('reports.index'))->assertForbidden();
+        $this->actingAs($admin)->get('/jemaat/dashboard')->assertForbidden();
     }
 }

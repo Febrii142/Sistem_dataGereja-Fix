@@ -21,6 +21,8 @@ class Jemaat extends Model
         'kode_pos',
         'no_telepon',
         'email',
+        'status_perkawinan',
+        'kategori_jemaat',
         'status_baptis',
         'tanggal_baptis',
         'kepala_keluarga_id',
@@ -44,6 +46,11 @@ class Jemaat extends Model
     public function baptisan(): HasOne
     {
         return $this->hasOne(Baptisan::class, 'jemaat_id');
+    }
+
+    public function keluargaJemaat(): HasMany
+    {
+        return $this->hasMany(KeluargaJemaat::class, 'jemaat_id');
     }
 
     public function isKepalaKeluarga(): bool

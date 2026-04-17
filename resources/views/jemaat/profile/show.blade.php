@@ -12,6 +12,6 @@
         <p><span class="font-semibold">Status Baptis:</span> {{ ucfirst($jemaat->status_baptis) }}</p>
         <p><span class="font-semibold">Tanggal Baptis:</span> {{ $jemaat->tanggal_baptis ? \Illuminate\Support\Carbon::parse($jemaat->tanggal_baptis)->format('d M Y') : '-' }}</p>
     </div>
-    <a href="{{ route('jemaat.profile.edit') }}" class="inline-flex rounded bg-blue-700 px-4 py-2 font-semibold text-white">Edit Profil</a>
+    <a href="{{ route('jemaat.profile') }}" class="inline-flex rounded bg-blue-700 px-4 py-2 font-semibold text-white">Edit Profil</a>
 </div>
 @endsection

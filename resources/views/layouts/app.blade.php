@@ -23,10 +23,7 @@
             @endif
             <nav class="space-y-2 text-sm">
                 @if($user->hasPermission('view_jemaat_dashboard'))
-                    <a href="{{ route('jemaat.dashboard') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('jemaat.dashboard') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Dashboard Jemaat</a>
-                    <a href="{{ route('jemaat.profile.show') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('jemaat.profile.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Profil Saya</a>
-                    <a href="{{ route('jemaat.keluarga.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('jemaat.keluarga.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Keluarga</a>
-                    <a href="{{ route('jemaat.registration.show', 1) }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('jemaat.registration.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Form Pendaftaran</a>
+                    @include('jemaat.layouts.sidebar')
                 @endif
                 @if($user->hasPermission('view_dashboard'))
                     <a href="{{ route('dashboard') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('dashboard') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Dashboard</a>
