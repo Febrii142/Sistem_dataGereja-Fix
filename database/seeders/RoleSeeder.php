@@ -30,6 +30,15 @@ class RoleSeeder extends Seeder
                     'view_dashboard',
                 ],
             ],
+            'Jemaat Gereja' => [
+                'description' => 'Akses dashboard jemaat, profil pribadi, dan manajemen keluarga',
+                'permissions' => [
+                    'view_jemaat_dashboard',
+                    'edit_own_jemaat',
+                    'view_own_family',
+                    'manage_family_members',
+                ],
+            ],
             'Member' => [
                 'description' => 'Akses terbatas hanya dashboard pribadi',
                 'permissions' => ['view_dashboard'],

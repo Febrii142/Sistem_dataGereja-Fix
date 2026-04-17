@@ -30,6 +30,10 @@ class PermissionSeeder extends Seeder
             ['name' => 'export_reports', 'description' => 'Ekspor laporan'],
             ['name' => 'view_settings', 'description' => 'Melihat pengaturan'],
             ['name' => 'edit_settings', 'description' => 'Mengubah pengaturan'],
+            ['name' => 'view_jemaat_dashboard', 'description' => 'Melihat dashboard jemaat'],
+            ['name' => 'edit_own_jemaat', 'description' => 'Mengubah data jemaat sendiri'],
+            ['name' => 'view_own_family', 'description' => 'Melihat data keluarga sendiri'],
+            ['name' => 'manage_family_members', 'description' => 'Mengelola anggota keluarga'],
         ];
 
         foreach ($permissions as $permission) {

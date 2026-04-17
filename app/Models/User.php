@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -41,6 +42,11 @@ class User extends Authenticatable
             'role_id',
             'id'
         );
+    }
+
+    public function jemaat(): HasOne
+    {
+        return $this->hasOne(Jemaat::class, 'user_id');
     }
 
     public function hasPermission(string $permission): bool
@@ -80,8 +86,12 @@ class User extends Authenticatable
 
     public function hasRole(string|array $roles): bool
     {
-        $roles = array_map(static fn (string $role) => strtolower($role), (array) $roles);
-        $roleName = strtolower((string) ($this->role()->value('name') ?? $this->getAttribute('role')));
+        $roles = array_map(
+            static fn (string $role) => str_replace(' ', '', strtolower($role)),
+            (array) $roles
+        );
+
+        $roleName = str_replace(' ', '', strtolower((string) ($this->role()->value('name') ?? $this->getAttribute('role'))));
 
         return in_array($roleName, $roles, true);
     }

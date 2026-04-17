@@ -22,6 +22,12 @@
                 </a>
             @endif
             <nav class="space-y-2 text-sm">
+                @if($user->hasPermission('view_jemaat_dashboard'))
+                    <a href="{{ route('jemaat.dashboard') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('jemaat.dashboard') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Dashboard Jemaat</a>
+                    <a href="{{ route('jemaat.profile.show') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('jemaat.profile.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Profil Saya</a>
+                    <a href="{{ route('jemaat.keluarga.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('jemaat.keluarga.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Keluarga</a>
+                    <a href="{{ route('jemaat.registration.show', 1) }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('jemaat.registration.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Form Pendaftaran</a>
+                @endif
                 @if($user->hasPermission('view_dashboard'))
                     <a href="{{ route('dashboard') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('dashboard') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Dashboard</a>
                 @endif
@@ -52,7 +58,7 @@
         <main class="flex min-h-screen flex-col">
             <header class="border-b border-slate-200 bg-white px-4 py-3 lg:px-8">
                 <div class="flex flex-wrap items-center justify-between gap-3">
-                    <form class="w-full max-w-lg" method="get" action="{{ $user->hasPermission('view_members') ? route('members.index') : route('dashboard') }}">
+                    <form class="w-full max-w-lg" method="get" action="{{ $user->hasPermission('view_members') ? route('members.index') : ($user->hasPermission('view_jemaat_dashboard') ? route('jemaat.dashboard') : route('dashboard')) }}">
                         <label>
                             <span class="sr-only">Search</span>
                             <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari data jemaat..." class="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm focus:border-[#3b82f6] focus:outline-none">

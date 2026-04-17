@@ -104,6 +104,7 @@ class UserController extends Controller
             'Admin' => 'admin',
             'Pendeta' => 'pendeta',
             'Staff' => 'koordinator',
+            'Jemaat Gereja' => 'jemaat',
             default => 'user',
         };
     }

@@ -19,6 +19,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $adminRoleId = Role::query()->where('name', 'Admin')->value('id');
+        $jemaatRoleId = Role::query()->where('name', 'Jemaat Gereja')->value('id')
+            ?? Role::query()->where('name', 'Member')->value('id');
 
         User::query()->updateOrCreate(
             ['email' => 'admin@gereja.local'],
@@ -27,6 +29,16 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make('Admin123!'),
                 'role' => 'admin',
                 'role_id' => $adminRoleId,
+            ]
+        );
+
+        User::query()->updateOrCreate(
+            ['email' => 'jemaat@gereja.local'],
+            [
+                'name' => 'Jemaat Gereja',
+                'password' => Hash::make('Jemaat123!'),
+                'role' => 'jemaat',
+                'role_id' => $jemaatRoleId,
             ]
         );
 
