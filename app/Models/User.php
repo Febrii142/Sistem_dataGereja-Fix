@@ -15,6 +15,15 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
+    private const ROLE_ALIASES = [
+        'koordinator' => 'staff',
+        'staff' => 'koordinator',
+        'user' => 'member',
+        'member' => 'user',
+        'jemaat' => 'jemaatgereja',
+        'jemaatgereja' => 'jemaat',
+    ];
+
     protected $fillable = ['name', 'email', 'password', 'role', 'role_id'];
 
     protected $hidden = ['password', 'remember_token'];
@@ -93,15 +102,10 @@ class User extends Authenticatable
 
         $roleName = str_replace(' ', '', strtolower((string) $this->getAttribute('role')));
 
-        $aliases = match ($roleName) {
-            'koordinator' => ['koordinator', 'staff'],
-            'staff' => ['staff', 'koordinator'],
-            'user' => ['user', 'member'],
-            'member' => ['member', 'user'],
-            'jemaat' => ['jemaat', 'jemaatgereja'],
-            'jemaatgereja' => ['jemaatgereja', 'jemaat'],
-            default => [$roleName],
-        };
+        $aliases = array_filter([
+            $roleName,
+            self::ROLE_ALIASES[$roleName] ?? null,
+        ]);
 
         return (bool) array_intersect($aliases, $requestedRoles);
     }
