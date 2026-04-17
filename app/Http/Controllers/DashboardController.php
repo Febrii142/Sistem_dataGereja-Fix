@@ -10,6 +10,10 @@ class DashboardController extends Controller
 {
     public function index()
     {
+        if (auth()->check() && auth()->user()->hasRole(['Jemaat Gereja', 'jemaat'])) {
+            return redirect()->route('jemaat.dashboard');
+        }
+
         $totalJemaat = Member::count();
         $jemaatBaru = Member::where('created_at', '>=', now()->subMonth())->count();
         $lakiLaki = Member::where('jenis_kelamin', 'L')->count();

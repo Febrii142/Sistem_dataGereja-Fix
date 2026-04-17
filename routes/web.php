@@ -1,9 +1,12 @@
 <?php
 
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\AnggotaKeluargaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\JemaatController;
+use App\Http\Controllers\JemaatRegistrationController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
@@ -55,4 +58,25 @@ Route::middleware('auth')->group(function () {
     Route::get('/roles', [RoleController::class, 'index'])
         ->middleware(['role:Admin', 'permission:assign_roles'])
         ->name('roles.index');
+
+    Route::prefix('jemaat')
+        ->name('jemaat.')
+        ->middleware('role:Jemaat Gereja')
+        ->group(function () {
+            Route::get('/dashboard', [JemaatController::class, 'dashboard'])->name('dashboard');
+            Route::get('/profile', [JemaatController::class, 'showProfile'])->name('profile.show');
+            Route::get('/profile/edit', [JemaatController::class, 'editProfile'])->name('profile.edit');
+            Route::put('/profile', [JemaatController::class, 'updateProfile'])->name('profile.update');
+
+            Route::get('/registration/step/{step}', [JemaatRegistrationController::class, 'showStep'])->name('registration.show');
+            Route::post('/registration/step/{step}', [JemaatRegistrationController::class, 'saveStep'])->name('registration.save');
+            Route::post('/registration/draft', [JemaatRegistrationController::class, 'saveDraft'])->name('registration.draft');
+
+            Route::get('/keluarga', [AnggotaKeluargaController::class, 'index'])->name('keluarga.index');
+            Route::get('/keluarga/create', [AnggotaKeluargaController::class, 'create'])->name('keluarga.create');
+            Route::post('/keluarga', [AnggotaKeluargaController::class, 'store'])->name('keluarga.store');
+            Route::get('/keluarga/{id}/edit', [AnggotaKeluargaController::class, 'edit'])->name('keluarga.edit');
+            Route::put('/keluarga/{id}', [AnggotaKeluargaController::class, 'update'])->name('keluarga.update');
+            Route::delete('/keluarga/{id}', [AnggotaKeluargaController::class, 'destroy'])->name('keluarga.destroy');
+        });
 });

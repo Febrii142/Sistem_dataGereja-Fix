@@ -28,7 +28,11 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard'));
+        $target = auth()->user()?->hasRole(['Jemaat Gereja', 'jemaat'])
+            ? route('jemaat.dashboard')
+            : route('dashboard');
+
+        return redirect()->intended($target);
     }
 
     public function showRegister()
@@ -44,19 +48,20 @@ class AuthController extends Controller
             'password' => ['required', 'confirmed', 'min:8'],
         ]);
 
-        $memberRoleId = Role::query()->where('name', 'Member')->value('id');
+        $memberRoleId = Role::query()->where('name', 'Jemaat Gereja')->value('id')
+            ?? Role::query()->where('name', 'Member')->value('id');
 
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
-            'role' => 'user',
+            'role' => 'jemaat',
             'role_id' => $memberRoleId,
         ]);
 
         Auth::login($user);
 
-        return redirect()->route('dashboard');
+        return redirect()->route('jemaat.dashboard');
     }
 
     public function logout(Request $request)
