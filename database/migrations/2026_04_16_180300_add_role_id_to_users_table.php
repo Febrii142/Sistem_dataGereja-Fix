@@ -10,7 +10,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->foreignId('role_id')->nullable()->after('role')->constrained('roles')->nullOnDelete();
+            $table->unsignedBigInteger('role_id')->nullable()->after('role');
+            $table->foreign('role_id')
+                ->references('id')
+                ->on('roles')
+                ->nullOnDelete();
         });
 
         $roles = DB::table('roles')->pluck('id', 'name');
@@ -34,7 +38,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropConstrainedForeignId('role_id');
+            $table->dropForeign(['role_id']);
+            $table->dropColumn('role_id');
         });
     }
 };
