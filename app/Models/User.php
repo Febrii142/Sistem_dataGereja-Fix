@@ -3,8 +3,6 @@
 namespace App\Models;
 
 use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -12,12 +10,14 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'role', 'role_id'])]
-#[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    protected $fillable = ['name', 'email', 'password', 'role', 'role_id'];
+
+    protected $hidden = ['password', 'remember_token'];
 
     protected function casts(): array
     {
@@ -86,18 +86,28 @@ class User extends Authenticatable
 
     public function hasRole(string|array $roles): bool
     {
-        $roles = array_map(
+        $requestedRoles = array_map(
             static fn (string $role) => str_replace(' ', '', strtolower($role)),
             (array) $roles
         );
 
-        $roleName = str_replace(' ', '', strtolower((string) ($this->role()->value('name') ?? $this->getAttribute('role'))));
+        $roleName = str_replace(' ', '', strtolower((string) $this->getAttribute('role')));
 
-        return in_array($roleName, $roles, true);
+        $aliases = match ($roleName) {
+            'koordinator' => ['koordinator', 'staff'],
+            'staff' => ['staff', 'koordinator'],
+            'user' => ['user', 'member'],
+            'member' => ['member', 'user'],
+            'jemaat' => ['jemaat', 'jemaatgereja'],
+            'jemaatgereja' => ['jemaatgereja', 'jemaat'],
+            default => [$roleName],
+        };
+
+        return (bool) array_intersect($aliases, $requestedRoles);
     }
 
     public function getRoleNameAttribute(): ?string
     {
-        return $this->role()->value('name') ?? $this->getAttribute('role');
+        return $this->getAttribute('role');
     }
 }
