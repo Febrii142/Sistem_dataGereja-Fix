@@ -12,27 +12,37 @@
 </head>
 <body class="bg-slate-100 text-slate-900">
 @auth
+    @php($user = auth()->user())
     <div class="min-h-screen lg:grid lg:grid-cols-[260px_1fr]">
         <aside class="flex flex-col bg-[#1e40af] p-4 text-white">
             <h1 class="mb-6 text-xl font-bold">SIM Jemaat</h1>
-            <a href="{{ route('members.create') }}" class="mb-4 inline-flex items-center justify-center rounded-lg bg-white px-3 py-2 text-sm font-semibold text-[#1e40af] hover:bg-slate-100">
-                + Tambah Data Baru
-            </a>
+            @if($user->hasPermission('create_members'))
+                <a href="{{ route('members.create') }}" class="mb-4 inline-flex items-center justify-center rounded-lg bg-white px-3 py-2 text-sm font-semibold text-[#1e40af] hover:bg-slate-100">
+                    + Tambah Data Baru
+                </a>
+            @endif
             <nav class="space-y-2 text-sm">
-                <a href="{{ route('dashboard') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('dashboard') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Dashboard</a>
-                <a href="{{ route('members.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('members.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Jemaat</a>
-                <a href="{{ route('attendances.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('attendances.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Kehadiran</a>
-                @if(auth()->user()->role === 'admin')
+                @if($user->hasPermission('view_dashboard'))
+                    <a href="{{ route('dashboard') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('dashboard') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Dashboard</a>
+                @endif
+                @if($user->hasPermission('view_members'))
+                    <a href="{{ route('members.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('members.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Jemaat</a>
+                @endif
+                @if($user->hasPermission('view_categories'))
+                    <a href="{{ route('categories.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('categories.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Kategori</a>
+                @endif
+                @if($user->hasPermission('view_users'))
                     <a href="{{ route('users.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('users.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">User Management</a>
-                @else
-                    <span class="block cursor-not-allowed rounded-lg px-3 py-2 text-slate-200">User Management</span>
                 @endif
-                @if(in_array(auth()->user()->role, ['admin','pendeta','koordinator'], true))
+                @if($user->hasPermission('assign_roles'))
+                    <a href="{{ route('roles.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('roles.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Roles & Permissions</a>
+                @endif
+                @if($user->hasPermission('view_reports'))
                     <a href="{{ route('reports.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('reports.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Laporan</a>
-                @else
-                    <span class="block cursor-not-allowed rounded-lg px-3 py-2 text-slate-200">Laporan</span>
                 @endif
-                <a href="{{ route('settings.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('settings.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Settings</a>
+                @if($user->hasPermission('view_settings'))
+                    <a href="{{ route('settings.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('settings.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Settings</a>
+                @endif
             </nav>
             <form action="{{ route('logout') }}" method="post" class="mt-auto pt-6">
                 @csrf
@@ -42,7 +52,7 @@
         <main class="flex min-h-screen flex-col">
             <header class="border-b border-slate-200 bg-white px-4 py-3 lg:px-8">
                 <div class="flex flex-wrap items-center justify-between gap-3">
-                    <form class="w-full max-w-lg" method="get" action="{{ route('members.index') }}">
+                    <form class="w-full max-w-lg" method="get" action="{{ $user->hasPermission('view_members') ? route('members.index') : route('dashboard') }}">
                         <label>
                             <span class="sr-only">Search</span>
                             <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari data jemaat..." class="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm focus:border-[#3b82f6] focus:outline-none">
@@ -56,8 +66,8 @@
                             </svg>
                         </a>
                         <div class="rounded-lg bg-slate-100 px-3 py-2 text-sm">
-                            <p class="font-semibold">{{ auth()->user()->name }}</p>
-                            <p class="text-xs text-slate-500">{{ ucfirst(auth()->user()->role) }}</p>
+                            <p class="font-semibold">{{ $user->name }}</p>
+                            <p class="text-xs text-slate-500">{{ $user->role_name ? ucfirst($user->role_name) : '-' }}</p>
                         </div>
                     </div>
                 </div>

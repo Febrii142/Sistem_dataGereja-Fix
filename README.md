@@ -24,8 +24,9 @@ Implementasi awal website manajemen dan pendataan jemaat gereja berbasis **Larav
 
 4. **User Management & Auth**
    - Login/Register berbasis session Laravel
-   - Role-based access control: `admin`, `pendeta`, `koordinator`, `user`
-   - Manajemen akun pengguna (khusus admin)
+   - RBAC berbasis `roles`, `permissions`, dan `role_permissions`
+   - Role bawaan: `Admin`, `Pendeta`, `Staff`, `Member`
+   - Manajemen akun pengguna + assignment role berbasis permission
 
 5. **Laporan & Analytics**
    - Laporan demografis jemaat
@@ -84,5 +85,4 @@ Akses: `http://127.0.0.1:8000`
 
 - Email: `admin@gereja.local`
 - Password: `Admin123!`
-- Role: `admin`
-
+- Role: `Admin`

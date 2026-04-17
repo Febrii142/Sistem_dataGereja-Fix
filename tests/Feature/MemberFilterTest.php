@@ -4,7 +4,10 @@ namespace Tests\Feature;
 
 use App\Exports\MembersExport;
 use App\Models\Member;
+use App\Models\Role;
 use App\Models\User;
+use Database\Seeders\PermissionSeeder;
+use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Maatwebsite\Excel\Facades\Excel;
 use Tests\TestCase;
@@ -15,7 +18,15 @@ class MemberFilterTest extends TestCase
 
     public function test_members_index_supports_combined_category_filters(): void
     {
-        $user = User::factory()->create();
+        $this->seed([
+            PermissionSeeder::class,
+            RoleSeeder::class,
+        ]);
+
+        $user = User::factory()->create([
+            'role_id' => Role::query()->where('name', 'Staff')->value('id'),
+            'role' => 'koordinator',
+        ]);
 
         Member::create([
             'nama' => 'Andi Dewasa',
@@ -72,7 +83,15 @@ class MemberFilterTest extends TestCase
 
     public function test_members_export_excel_uses_active_category_filters(): void
     {
-        $user = User::factory()->create();
+        $this->seed([
+            PermissionSeeder::class,
+            RoleSeeder::class,
+        ]);
+
+        $user = User::factory()->create([
+            'role_id' => Role::query()->where('name', 'Staff')->value('id'),
+            'role' => 'koordinator',
+        ]);
 
         Member::create([
             'nama' => 'Andi Dewasa',

@@ -5,8 +5,10 @@
     @csrf
     <input class="rounded border px-3 py-2" name="name" placeholder="Nama" required>
     <input class="rounded border px-3 py-2" name="email" type="email" placeholder="Email" required>
-    <select name="role" class="rounded border px-3 py-2" required>
-        <option value="admin">Admin</option><option value="pendeta">Pendeta</option><option value="koordinator">Koordinator</option><option value="user">User Biasa</option>
+    <select name="role_id" class="rounded border px-3 py-2" required>
+        @foreach($roles as $role)
+            <option value="{{ $role->id }}">{{ $role->name }}</option>
+        @endforeach
     </select>
     <input class="rounded border px-3 py-2" name="password" type="password" placeholder="Password" required>
     <input class="rounded border px-3 py-2" name="password_confirmation" type="password" placeholder="Konfirmasi Password" required>

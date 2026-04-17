@@ -8,6 +8,12 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class ReportController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:view_reports')->only(['index']);
+        $this->middleware('permission:export_reports')->only(['exportPdf']);
+    }
+
     public function index()
     {
         $demografi = Member::query()
