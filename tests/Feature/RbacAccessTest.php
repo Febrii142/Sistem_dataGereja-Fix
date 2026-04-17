@@ -26,6 +26,7 @@ class RbacAccessTest extends TestCase
                 'Admin' => 'admin',
                 'Pendeta' => 'pendeta',
                 'Staff' => 'koordinator',
+                'Jemaat Gereja' => 'jemaat',
                 default => 'user',
             },
         ]);
