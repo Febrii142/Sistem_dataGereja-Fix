@@ -6,22 +6,36 @@ use App\Models\Attendance;
 use App\Models\Jemaat;
 use App\Models\KategoriJemaat;
 use App\Models\KeluargaJemaat;
+use App\Models\Member;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class JemaatDashboardController extends Controller
 {
+    private const DEFAULT_AGE_YEARS = 18;
+
     public function dashboard(): View
     {
         $jemaat = $this->getOrCreateCurrentJemaat();
-        $attendanceCount = Attendance::query()->where('hadir', true)->count();
+        $memberIds = Member::query()
+            ->where(function ($query) use ($jemaat) {
+                $query->where('nama', $jemaat->nama_lengkap)
+                    ->orWhere('kontak', $jemaat->no_telepon);
+            })
+            ->pluck('id');
+
+        $attendanceCount = Attendance::query()
+            ->whereIn('member_id', $memberIds)
+            ->where('hadir', true)
+            ->count();
 
         return view('jemaat.dashboard', [
             'jemaat' => $jemaat,
             'familyCount' => KeluargaJemaat::query()->where('jemaat_id', $jemaat->id)->count(),
             'attendanceCount' => $attendanceCount,
             'upcomingEvents' => Attendance::query()
+                ->whereIn('member_id', $memberIds)
                 ->select('service_date')
                 ->whereDate('service_date', '>=', now()->toDateString())
                 ->orderBy('service_date')
@@ -137,8 +151,8 @@ class JemaatDashboardController extends Controller
             [
                 'nama_lengkap' => $user->name,
                 'tempat_lahir' => '-',
-                'tanggal_lahir' => now()->subYears(18)->toDateString(),
-                'no_telepon' => '0',
+                'tanggal_lahir' => now()->subYears(self::DEFAULT_AGE_YEARS)->toDateString(),
+                'no_telepon' => '-',
                 'email' => $user->email,
                 'status_perkawinan' => 'Belum Menikah',
                 'kategori_jemaat' => 'Umum',

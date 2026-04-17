@@ -66,8 +66,6 @@ Route::middleware('auth')->group(function () {
         ->group(function () {
             Route::get('/dashboard', [JemaatDashboardController::class, 'dashboard'])->name('dashboard');
             Route::get('/profile/show', [JemaatController::class, 'showProfile'])->name('profile.show');
-            Route::get('/profile/edit', [JemaatController::class, 'editProfile'])->name('profile.edit');
-            Route::put('/profile', [JemaatController::class, 'updateProfile'])->name('profile.update');
             Route::get('/profile', [JemaatDashboardController::class, 'profile'])->name('profile');
             Route::post('/profile/update', [JemaatDashboardController::class, 'updateProfile'])->name('profile.update.post');
             Route::get('/family', [JemaatDashboardController::class, 'family'])->name('family');

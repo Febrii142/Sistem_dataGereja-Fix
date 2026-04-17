@@ -111,7 +111,7 @@ class JemaatRegistrationController extends Controller
 
     public function editProfile(): RedirectResponse
     {
-        return redirect()->route('jemaat.profile.edit');
+        return redirect()->route('jemaat.profile');
     }
 
     public function showStep1(): View
