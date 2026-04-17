@@ -5,6 +5,7 @@ use App\Http\Controllers\AnggotaKeluargaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\JemaatDashboardController;
 use App\Http\Controllers\JemaatController;
 use App\Http\Controllers\JemaatRegistrationController;
 use App\Http\Controllers\MemberController;
@@ -63,10 +64,16 @@ Route::middleware('auth')->group(function () {
         ->name('jemaat.')
         ->middleware('role:Jemaat Gereja')
         ->group(function () {
-            Route::get('/dashboard', [JemaatController::class, 'dashboard'])->name('dashboard');
-            Route::get('/profile', [JemaatController::class, 'showProfile'])->name('profile.show');
+            Route::get('/dashboard', [JemaatDashboardController::class, 'dashboard'])->name('dashboard');
+            Route::get('/profile/show', [JemaatController::class, 'showProfile'])->name('profile.show');
             Route::get('/profile/edit', [JemaatController::class, 'editProfile'])->name('profile.edit');
             Route::put('/profile', [JemaatController::class, 'updateProfile'])->name('profile.update');
+            Route::get('/profile', [JemaatDashboardController::class, 'profile'])->name('profile');
+            Route::post('/profile/update', [JemaatDashboardController::class, 'updateProfile'])->name('profile.update.post');
+            Route::get('/family', [JemaatDashboardController::class, 'family'])->name('family');
+            Route::post('/family/store', [JemaatDashboardController::class, 'storeFamily'])->name('family.store');
+            Route::post('/family/{id}/update', [JemaatDashboardController::class, 'updateFamily'])->name('family.update');
+            Route::delete('/family/{id}', [JemaatDashboardController::class, 'deleteFamily'])->name('family.delete');
 
             Route::get('/registration/step/{step}', [JemaatRegistrationController::class, 'showStep'])->name('registration.show');
             Route::post('/registration/step/{step}', [JemaatRegistrationController::class, 'saveStep'])->name('registration.save');

@@ -137,4 +137,60 @@ class JemaatFeatureTest extends TestCase
             'hubungan_keluarga' => 'Anak',
         ]);
     }
+
+    public function test_jemaat_can_manage_profile_and_new_family_routes(): void
+    {
+        $user = $this->createJemaatUser('Jemaat Dashboard');
+
+        $this->actingAs($user)->get('/jemaat/dashboard')->assertOk();
+        $this->actingAs($user)->get('/jemaat/profile')->assertOk();
+
+        $this->actingAs($user)
+            ->post('/jemaat/profile/update', [
+                'nama' => 'Jemaat Dashboard Update',
+                'email' => 'jemaatdashboard@gereja.test',
+                'no_telp' => '081122334455',
+                'alamat' => 'Jl. Damai Sentosa',
+                'tempat_lahir' => 'Bandung',
+                'tanggal_lahir' => '1998-02-11',
+                'status_perkawinan' => 'Menikah',
+                'kategori_jemaat' => 'Dewasa',
+            ])
+            ->assertRedirect(route('jemaat.profile'));
+
+        $this->assertDatabaseHas('jemaat', [
+            'user_id' => $user->id,
+            'nama_lengkap' => 'Jemaat Dashboard Update',
+            'status_perkawinan' => 'Menikah',
+            'kategori_jemaat' => 'Dewasa',
+        ]);
+
+        $this->actingAs($user)
+            ->post('/jemaat/family/store', [
+                'nama' => 'Anak Pertama',
+                'hubungan' => 'Anak',
+                'no_telp' => '081199988877',
+                'tanggal_lahir' => '2020-01-01',
+            ])
+            ->assertRedirect(route('jemaat.family'));
+
+        $familyId = \DB::table('keluarga_jemaat')->value('id');
+
+        $this->actingAs($user)
+            ->post('/jemaat/family/'.$familyId.'/update', [
+                'nama' => 'Anak Pertama Update',
+                'hubungan' => 'Anak',
+                'no_telp' => '081199988800',
+                'tanggal_lahir' => '2020-01-01',
+            ])
+            ->assertRedirect(route('jemaat.family'));
+
+        $this->assertDatabaseHas('keluarga_jemaat', [
+            'id' => $familyId,
+            'nama' => 'Anak Pertama Update',
+        ]);
+
+        $this->actingAs($user)->delete('/jemaat/family/'.$familyId)->assertRedirect(route('jemaat.family'));
+        $this->assertDatabaseMissing('keluarga_jemaat', ['id' => $familyId]);
+    }
 }
