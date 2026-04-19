@@ -6,9 +6,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\JemaatDashboardController;
-use App\Http\Controllers\JemaatController;
 use App\Http\Controllers\JemaatRegistrationController;
 use App\Http\Controllers\MemberController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -65,9 +65,10 @@ Route::middleware('auth')->group(function () {
         ->middleware('role:Jemaat Gereja')
         ->group(function () {
             Route::get('/dashboard', [JemaatDashboardController::class, 'dashboard'])->name('dashboard');
-            Route::get('/profile/show', [JemaatController::class, 'showProfile'])->name('profile.show');
-            Route::get('/profile', [JemaatDashboardController::class, 'profile'])->name('profile');
-            Route::post('/profile/update', [JemaatDashboardController::class, 'updateProfile'])->name('profile.update.post');
+            Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
+            Route::get('/profile/show', [ProfileController::class, 'show'])->name('profile.show');
+            Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+            Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
             Route::get('/family', [JemaatDashboardController::class, 'family'])->name('family');
             Route::post('/family/store', [JemaatDashboardController::class, 'storeFamily'])->name('family.store');
             Route::post('/family/{id}/update', [JemaatDashboardController::class, 'updateFamily'])->name('family.update');

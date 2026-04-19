@@ -14,8 +14,10 @@ class Jemaat extends Model
     protected $fillable = [
         'user_id',
         'nama_lengkap',
+        'no_identitas',
         'tempat_lahir',
         'tanggal_lahir',
+        'jenis_kelamin',
         'alamat',
         'kota',
         'kode_pos',
