@@ -144,25 +144,26 @@ class JemaatFeatureTest extends TestCase
 
         $this->actingAs($user)->get('/jemaat/dashboard')->assertOk();
         $this->actingAs($user)->get('/jemaat/profile')->assertOk();
+        $this->actingAs($user)->get('/jemaat/profile/edit')->assertOk();
 
         $this->actingAs($user)
-            ->post('/jemaat/profile/update', [
+            ->post('/jemaat/profile', [
                 'nama' => 'Jemaat Dashboard Update',
-                'email' => 'jemaatdashboard@gereja.test',
-                'no_telp' => '081122334455',
+                'no_identitas' => '3201012345678999',
+                'jenis_kelamin' => 'L',
+                'nomor_telepon' => '081122334455',
                 'alamat' => 'Jl. Damai Sentosa',
-                'tempat_lahir' => 'Bandung',
                 'tanggal_lahir' => '1998-02-11',
-                'status_perkawinan' => 'Menikah',
-                'kategori_jemaat' => 'Dewasa',
+                'status_pernikahan' => 'Menikah',
             ])
             ->assertRedirect(route('jemaat.profile'));
 
         $this->assertDatabaseHas('jemaat', [
             'user_id' => $user->id,
             'nama_lengkap' => 'Jemaat Dashboard Update',
+            'no_identitas' => '3201012345678999',
+            'jenis_kelamin' => 'L',
             'status_perkawinan' => 'Menikah',
-            'kategori_jemaat' => 'Dewasa',
         ]);
 
         $this->actingAs($user)
