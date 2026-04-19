@@ -12,14 +12,14 @@ class ProfileController extends Controller
     public function show(): View
     {
         return view('profile.show', [
-            'jemaat' => $this->getOrCreateCurrentJemaat(),
+            'jemaat' => $this->getCurrentJemaat(),
         ]);
     }
 
     public function edit(): View
     {
         return view('profile.edit', [
-            'jemaat' => $this->getOrCreateCurrentJemaat(),
+            'jemaat' => $this->getCurrentJemaat(),
         ]);
     }
 
@@ -28,15 +28,17 @@ class ProfileController extends Controller
         $validated = $request->validate([
             'nama' => ['required', 'string', 'min:3', 'max:255'],
             'no_identitas' => ['nullable', 'string', 'max:50'],
-            'tanggal_lahir' => ['required', 'date'],
+            'tanggal_lahir' => ['required', 'date', 'before_or_equal:today'],
             'jenis_kelamin' => ['nullable', 'in:L,P'],
             'alamat' => ['required', 'string', 'min:5'],
             'nomor_telepon' => ['required', 'string', 'max:30'],
             'status_pernikahan' => ['nullable', 'string', 'max:100'],
         ]);
 
-        $jemaat = $this->getOrCreateCurrentJemaat();
-        $jemaat->update([
+        /** @var \App\Models\User $user */
+        $user = auth()->user()->loadMissing('jemaat');
+        $jemaat = $user->jemaat()->firstOrNew();
+        $jemaat->fill([
             'nama_lengkap' => $validated['nama'],
             'no_identitas' => $validated['no_identitas'] ?: null,
             'tanggal_lahir' => $validated['tanggal_lahir'],
@@ -44,12 +46,15 @@ class ProfileController extends Controller
             'alamat' => $validated['alamat'],
             'no_telepon' => $validated['nomor_telepon'],
             'status_perkawinan' => $validated['status_pernikahan'] ?: null,
+            'email' => $user->email,
+            'tempat_lahir' => $jemaat->tempat_lahir ?: '',
         ]);
+        $jemaat->save();
 
         return redirect()->route('jemaat.profile')->with('success', 'Profil jemaat berhasil diperbarui.');
     }
 
-    private function getOrCreateCurrentJemaat(): Jemaat
+    private function getCurrentJemaat(): Jemaat
     {
         /** @var \App\Models\User $user */
         $user = auth()->user()->loadMissing('jemaat');
@@ -58,13 +63,10 @@ class ProfileController extends Controller
             return $user->jemaat->loadMissing('user');
         }
 
-        return $user->jemaat()->create([
+        return new Jemaat([
             'nama_lengkap' => $user->name,
-            'tempat_lahir' => '-',
-            'tanggal_lahir' => now()->subYears(18)->toDateString(),
-            'no_telepon' => '-',
+            'no_telepon' => '',
             'email' => $user->email,
-            'status_perkawinan' => 'Belum Menikah',
-        ])->load('user');
+        ]);
     }
 }
