@@ -24,6 +24,22 @@ class RegistrationController extends Controller
         return view('auth.register');
     }
 
+    public function success(Request $request): View|RedirectResponse
+    {
+        $registrationSuccess = $request->session()->pull('registration_success');
+
+        if (! is_array($registrationSuccess) || ! isset($registrationSuccess['email'], $registrationSuccess['password'])) {
+            return redirect()
+                ->route('register')
+                ->with('error', 'Data pendaftaran tidak ditemukan. Silakan daftar kembali.');
+        }
+
+        return view('auth.register-success', [
+            'email' => $registrationSuccess['email'],
+            'password' => $registrationSuccess['password'],
+        ]);
+    }
+
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
@@ -138,7 +154,10 @@ class RegistrationController extends Controller
         }
 
         return redirect()
-            ->route('login')
-            ->with('success', 'Pendaftaran berhasil dikirim. Password otomatis telah dikirim ke email Anda.');
+            ->route('register.success')
+            ->with('registration_success', [
+                'email' => $user->email,
+                'password' => $generatedPassword,
+            ]);
     }
 }

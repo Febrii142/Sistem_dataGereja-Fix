@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AdminApprovalController;
 use App\Http\Controllers\AnggotaKeluargaController;
+use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
@@ -22,6 +22,7 @@ Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.attempt');
     Route::get('/register', [RegistrationController::class, 'create'])->name('register');
+    Route::get('/register/success', [RegistrationController::class, 'success'])->name('register.success');
     Route::post('/register', [RegistrationController::class, 'store'])->name('register.store');
 });
 
