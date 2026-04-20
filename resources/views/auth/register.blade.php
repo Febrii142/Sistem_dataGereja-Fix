@@ -123,9 +123,9 @@
                                 <label for="catechism_batch" class="mb-1 block text-sm font-medium text-slate-700">Pilihan Gelombang Baptis</label>
                                 <select id="catechism_batch" name="catechism_batch" data-catechism-required class="w-full rounded-lg border border-slate-300 px-3 py-2">
                                     <option value="">Pilih gelombang</option>
-                                    <option value="Gelombang 1 (Januari - April 2024)" @selected(old('catechism_batch') === 'Gelombang 1 (Januari - April 2024)')>Gelombang 1 (Januari - April 2024)</option>
-                                    <option value="Gelombang 2 (Mei - Agustus 2024)" @selected(old('catechism_batch') === 'Gelombang 2 (Mei - Agustus 2024)')>Gelombang 2 (Mei - Agustus 2024)</option>
-                                    <option value="Gelombang 3 (September - Desember 2024)" @selected(old('catechism_batch') === 'Gelombang 3 (September - Desember 2024)')>Gelombang 3 (September - Desember 2024)</option>
+                                    <option value="Gelombang 1 (Januari - April)" @selected(old('catechism_batch') === 'Gelombang 1 (Januari - April)')>Gelombang 1 (Januari - April)</option>
+                                    <option value="Gelombang 2 (Mei - Agustus)" @selected(old('catechism_batch') === 'Gelombang 2 (Mei - Agustus)')>Gelombang 2 (Mei - Agustus)</option>
+                                    <option value="Gelombang 3 (September - Desember)" @selected(old('catechism_batch') === 'Gelombang 3 (September - Desember)')>Gelombang 3 (September - Desember)</option>
                                 </select>
                             </div>
                             <div>

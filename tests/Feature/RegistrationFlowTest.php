@@ -48,7 +48,7 @@ class RegistrationFlowTest extends TestCase
             'kota' => 'Bandung',
             'kode_pos' => '40111',
             'baptism_status' => 'belum_dibaptis',
-            'catechism_batch' => 'Gelombang 1 (Januari - April 2024)',
+            'catechism_batch' => 'Gelombang 1 (Januari - April)',
             'parent_guardian_name' => 'Budi Santoso',
         ])->assertRedirect(route('login'));
 
@@ -61,12 +61,12 @@ class RegistrationFlowTest extends TestCase
             'nama' => 'Jemaat Baru',
             'kontak' => '081212341234',
             'baptism_status' => 'belum_dibaptis',
-            'catechism_batch' => 'Gelombang 1 (Januari - April 2024)',
+            'catechism_batch' => 'Gelombang 1 (Januari - April)',
             'parent_guardian_name' => 'Budi Santoso',
         ]);
         $this->assertDatabaseHas('jemaat', [
             'nama_lengkap' => 'Jemaat Baru',
-            'kelas_katekisasi' => 'Gelombang 1 (Januari - April 2024)',
+            'kelas_katekisasi' => 'Gelombang 1 (Januari - April)',
         ]);
 
         $newUser = User::query()->where('email', 'jemaat.baru@test.local')->firstOrFail();
