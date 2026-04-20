@@ -4,14 +4,20 @@
 <div class="space-y-6">
     <h2 class="text-2xl font-bold text-blue-900">Manajemen Keluarga</h2>
 
-    <form method="post" action="{{ route('jemaat.family.store') }}" class="grid gap-3 rounded-xl bg-white p-6 shadow md:grid-cols-4">
-        @csrf
-        <input name="nama" value="{{ old('nama') }}" placeholder="Nama anggota" class="rounded border px-3 py-2 md:col-span-2" required>
-        <input name="hubungan" value="{{ old('hubungan') }}" placeholder="Hubungan keluarga" class="rounded border px-3 py-2" required>
-        <input name="no_telp" value="{{ old('no_telp') }}" placeholder="No. telepon" class="rounded border px-3 py-2">
-        <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir') }}" class="rounded border px-3 py-2">
-        <button class="rounded bg-blue-700 px-4 py-2 font-semibold text-white hover:bg-blue-800 md:col-span-4">Tambah Anggota</button>
-    </form>
+    @if(auth()->user()?->status === 'pending')
+        <div class="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+            Akun Anda masih menunggu approval. Data keluarga saat ini hanya bisa dilihat.
+        </div>
+    @else
+        <form method="post" action="{{ route('jemaat.family.store') }}" class="grid gap-3 rounded-xl bg-white p-6 shadow md:grid-cols-4">
+            @csrf
+            <input name="nama" value="{{ old('nama') }}" placeholder="Nama anggota" class="rounded border px-3 py-2 md:col-span-2" required>
+            <input name="hubungan" value="{{ old('hubungan') }}" placeholder="Hubungan keluarga" class="rounded border px-3 py-2" required>
+            <input name="no_telp" value="{{ old('no_telp') }}" placeholder="No. telepon" class="rounded border px-3 py-2">
+            <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir') }}" class="rounded border px-3 py-2">
+            <button class="rounded bg-blue-700 px-4 py-2 font-semibold text-white hover:bg-blue-800 md:col-span-4">Tambah Anggota</button>
+        </form>
+    @endif
 
     <div class="overflow-x-auto rounded-xl bg-white shadow">
         <table class="min-w-full text-sm">
@@ -40,15 +46,19 @@
                             <input form="update-family-{{ $member->id }}" type="date" name="tanggal_lahir" value="{{ $member->tanggal_lahir }}" class="w-full rounded border px-2 py-1">
                         </td>
                         <td class="px-4 py-3">
-                            <form id="update-family-{{ $member->id }}" method="post" action="{{ route('jemaat.family.update', $member->id) }}" class="inline">
-                                @csrf
-                                <button class="rounded bg-blue-100 px-3 py-1 text-blue-700 hover:bg-blue-200">Simpan</button>
-                            </form>
-                            <form method="post" action="{{ route('jemaat.family.delete', $member->id) }}" class="ml-1 inline" onsubmit="return confirm('Hapus anggota keluarga ini?')">
-                                @csrf
-                                @method('DELETE')
-                                <button class="rounded bg-rose-100 px-3 py-1 text-rose-700 hover:bg-rose-200">Hapus</button>
-                            </form>
+                            @if(auth()->user()?->status === 'approved')
+                                <form id="update-family-{{ $member->id }}" method="post" action="{{ route('jemaat.family.update', $member->id) }}" class="inline">
+                                    @csrf
+                                    <button class="rounded bg-blue-100 px-3 py-1 text-blue-700 hover:bg-blue-200">Simpan</button>
+                                </form>
+                                <form method="post" action="{{ route('jemaat.family.delete', $member->id) }}" class="ml-1 inline" onsubmit="return confirm('Hapus anggota keluarga ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="rounded bg-rose-100 px-3 py-1 text-rose-700 hover:bg-rose-200">Hapus</button>
+                                </form>
+                            @else
+                                <span class="text-xs text-slate-500">Read-only</span>
+                            @endif
                         </td>
                     </tr>
                 @empty

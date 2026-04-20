@@ -5,8 +5,16 @@
     <div class="rounded-xl bg-white p-6 shadow">
         <div class="mb-4 flex items-center justify-between gap-4">
             <h2 class="text-2xl font-bold text-blue-900">Profil Jemaat</h2>
-            <a href="{{ route('jemaat.profile.edit') }}" class="inline-flex rounded bg-blue-700 px-4 py-2 font-semibold text-white hover:bg-blue-800">Edit Profil</a>
+            @if(auth()->user()?->status === 'approved')
+                <a href="{{ route('jemaat.profile.edit') }}" class="inline-flex rounded bg-blue-700 px-4 py-2 font-semibold text-white hover:bg-blue-800">Edit Profil</a>
+            @endif
         </div>
+
+        @if(auth()->user()?->status === 'pending')
+            <div class="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+                Akun Anda masih menunggu approval. Profil hanya bisa dilihat.
+            </div>
+        @endif
 
         <div class="grid gap-3 text-sm md:grid-cols-2">
             <p><span class="font-semibold">Nama Jemaat:</span> {{ $jemaat->nama_lengkap }}</p>

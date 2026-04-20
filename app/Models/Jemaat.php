@@ -26,6 +26,7 @@ class Jemaat extends Model
         'status_perkawinan',
         'kategori_jemaat',
         'status_baptis',
+        'kelas_katekisasi',
         'tanggal_baptis',
         'kepala_keluarga_id',
     ];

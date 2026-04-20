@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
 class Member extends Model
 {
     protected $fillable = [
+        'user_id',
         'nama',
         'alamat',
         'kontak',
@@ -21,6 +23,11 @@ class Member extends Model
     public function attendances()
     {
         return $this->hasMany(Attendance::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function scopeFilterCategories(Builder $query, array $filters): Builder

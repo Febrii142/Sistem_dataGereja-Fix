@@ -2,6 +2,13 @@
 
 @section('content')
 <div class="space-y-6">
+    @if(auth()->user()?->status === 'pending')
+        <div class="rounded-xl border border-amber-300 bg-amber-50 p-4 text-amber-800">
+            <p class="font-semibold">Menunggu Approval dari Staff Gereja</p>
+            <p class="text-sm">Akun Anda masih pending. Akses saat ini read-only sampai disetujui.</p>
+        </div>
+    @endif
+
     <div class="rounded-xl bg-white p-6 shadow">
         <h2 class="text-2xl font-bold text-blue-900">Dashboard Jemaat</h2>
         <p class="mt-1 text-sm text-slate-600">Shalom, {{ $jemaat->nama_lengkap }}. Ringkasan akun jemaat Anda ada di sini.</p>
@@ -45,10 +52,12 @@
         </ul>
     </div>
 
-    <div class="grid gap-3 md:grid-cols-3">
-        <a href="{{ route('jemaat.profile') }}" class="rounded-lg bg-blue-700 px-4 py-3 text-center font-semibold text-white hover:bg-blue-800">Kelola Profil</a>
-        <a href="{{ route('jemaat.family') }}" class="rounded-lg bg-blue-100 px-4 py-3 text-center font-semibold text-blue-800 hover:bg-blue-200">Kelola Keluarga</a>
-        <a href="{{ route('jemaat.registration.show', 1) }}" class="rounded-lg bg-slate-900 px-4 py-3 text-center font-semibold text-white hover:bg-slate-800">Form Pendaftaran</a>
-    </div>
+    @if(auth()->user()?->status === 'approved')
+        <div class="grid gap-3 md:grid-cols-3">
+            <a href="{{ route('jemaat.profile') }}" class="rounded-lg bg-blue-700 px-4 py-3 text-center font-semibold text-white hover:bg-blue-800">Kelola Profil</a>
+            <a href="{{ route('jemaat.family') }}" class="rounded-lg bg-blue-100 px-4 py-3 text-center font-semibold text-blue-800 hover:bg-blue-200">Kelola Keluarga</a>
+            <a href="{{ route('jemaat.registration.show', 1) }}" class="rounded-lg bg-slate-900 px-4 py-3 text-center font-semibold text-white hover:bg-slate-800">Form Pendaftaran</a>
+        </div>
+    @endif
 </div>
 @endsection
