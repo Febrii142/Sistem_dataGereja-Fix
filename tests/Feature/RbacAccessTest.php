@@ -56,14 +56,14 @@ class RbacAccessTest extends TestCase
         $this->actingAs($member)
             ->get(route('jemaat.dashboard'))
             ->assertOk()
-            ->assertSee('Dashboard')
-            ->assertSee('Jemaat')
-            ->assertSee('Keanggotan')
-            ->assertSee('Settings')
-            ->assertDontSee('Kategori')
-            ->assertDontSee('User Management')
-            ->assertDontSee('Roles & Permissions')
-            ->assertDontSee('Laporan');
+            ->assertSee(route('jemaat.dashboard'), false)
+            ->assertSee(route('jemaat.profile'), false)
+            ->assertSee(route('jemaat.keluarga.index'), false)
+            ->assertSee(route('jemaat.profile.edit'), false)
+            ->assertDontSee(route('categories.index'), false)
+            ->assertDontSee(route('users.index'), false)
+            ->assertDontSee(route('roles.index'), false)
+            ->assertDontSee(route('reports.index'), false);
         $this->actingAs($member)->get('/jemaat/profile')->assertOk();
         $this->actingAs($member)->get('/jemaat/family')->assertOk();
         $this->actingAs($member)->get(route('members.index'))->assertForbidden();
