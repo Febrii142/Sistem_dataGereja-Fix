@@ -103,7 +103,7 @@
                     </div>
 
                     <div id="baptizedInfoSection" class="space-y-4 rounded-xl border border-slate-200 p-4">
-                        <h4 class="font-semibold text-slate-800">Data Baptisan (Opsional)</h4>
+                        <h4 class="font-semibold text-slate-800">Data Baptis (Opsional)</h4>
                         <div class="grid gap-4 sm:grid-cols-2">
                             <div>
                                 <label for="baptism_date" class="mb-1 block text-sm font-medium text-slate-700">Tanggal Baptis</label>
