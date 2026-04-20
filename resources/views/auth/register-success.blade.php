@@ -14,16 +14,16 @@
         <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div class="flex-1">
                 <p class="text-sm text-blue-700">Password Sementara</p>
-                <input id="temporaryPasswordField" type="text" readonly value="{{ $password }}" class="mt-1 w-full rounded-lg border border-blue-200 bg-white px-3 py-2 text-lg font-semibold tracking-wide text-blue-900">
+                <input id="temporaryPasswordField" type="text" readonly autocomplete="off" aria-label="Password Sementara" value="{{ $password }}" class="mt-1 w-full rounded-lg border border-blue-200 bg-white px-3 py-2 text-lg font-semibold tracking-wide text-blue-900">
             </div>
-            <button id="copyPasswordButton" type="button" class="rounded-lg bg-blue-700 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800">
-                Copy Password
+            <button id="copyPasswordButton" type="button" data-default-label="Salin Password" aria-live="polite" class="rounded-lg bg-blue-700 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800">
+                Salin Password
             </button>
         </div>
     </div>
 
     <p class="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800">
-        Simpan password ini untuk login.
+        Simpan password ini sekarang. Anda tidak akan melihatnya lagi, dan jangan bagikan ke siapa pun.
     </p>
 
     <a href="{{ route('login') }}" class="mt-6 inline-flex w-full items-center justify-center rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800">
@@ -37,6 +37,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const copyButton = document.getElementById('copyPasswordButton');
     const passwordField = document.getElementById('temporaryPasswordField');
+    const defaultLabel = copyButton?.dataset.defaultLabel ?? '';
 
     if (!copyButton || !passwordField) {
         return;
@@ -45,17 +46,14 @@ document.addEventListener('DOMContentLoaded', function () {
     copyButton.addEventListener('click', async function () {
         try {
             await navigator.clipboard.writeText(passwordField.value);
-            copyButton.textContent = 'Copied!';
+            copyButton.textContent = 'Tersalin!';
             setTimeout(function () {
-                copyButton.textContent = 'Copy Password';
+                copyButton.textContent = defaultLabel;
             }, 1500);
         } catch (error) {
+            copyButton.textContent = 'Salin secara manual';
+            passwordField.focus();
             passwordField.select();
-            document.execCommand('copy');
-            copyButton.textContent = 'Copied!';
-            setTimeout(function () {
-                copyButton.textContent = 'Copy Password';
-            }, 1500);
         }
     });
 });

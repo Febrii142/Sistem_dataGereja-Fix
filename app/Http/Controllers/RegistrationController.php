@@ -10,6 +10,7 @@ use App\Notifications\NewRegistrationSubmittedNotification;
 use App\Notifications\RegistrationCredentialsNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
@@ -19,6 +20,8 @@ use Illuminate\View\View;
 
 class RegistrationController extends Controller
 {
+    private const REGISTRATION_SUCCESS_TTL_MINUTES = 5;
+
     public function create(): View
     {
         return view('auth.register');
@@ -28,10 +31,22 @@ class RegistrationController extends Controller
     {
         $registrationSuccess = $request->session()->pull('registration_success');
 
-        if (! is_array($registrationSuccess) || ! isset($registrationSuccess['email'], $registrationSuccess['password'])) {
+        if (
+            ! is_array($registrationSuccess)
+            || ! isset($registrationSuccess['email'], $registrationSuccess['password'], $registrationSuccess['expires_at'])
+            || ! is_numeric($registrationSuccess['expires_at'])
+        ) {
             return redirect()
                 ->route('register')
                 ->with('error', 'Data pendaftaran tidak ditemukan. Silakan daftar kembali.');
+        }
+
+        $expiresAt = Carbon::createFromTimestamp((int) $registrationSuccess['expires_at']);
+
+        if (now()->greaterThan($expiresAt)) {
+            return redirect()
+                ->route('register')
+                ->with('error', 'Sesi konfirmasi telah berakhir. Silakan daftar kembali.');
         }
 
         return view('auth.register-success', [
@@ -158,6 +173,7 @@ class RegistrationController extends Controller
             ->with('registration_success', [
                 'email' => $user->email,
                 'password' => $generatedPassword,
+                'expires_at' => now()->addMinutes(self::REGISTRATION_SUCCESS_TTL_MINUTES)->timestamp,
             ]);
     }
 }

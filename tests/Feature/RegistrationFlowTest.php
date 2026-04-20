@@ -186,6 +186,7 @@ class RegistrationFlowTest extends TestCase
             'registration_success' => [
                 'email' => 'jemaat.success@test.local',
                 'password' => 'TempPass123!',
+                'expires_at' => now()->addMinutes(5)->timestamp,
             ],
         ])->get(route('register.success'))
             ->assertOk()
@@ -193,6 +194,19 @@ class RegistrationFlowTest extends TestCase
             ->assertSee('TempPass123!');
 
         $this->get(route('register.success'))
+            ->assertRedirect(route('register'))
+            ->assertSessionHas('error');
+    }
+
+    public function test_registration_success_page_rejects_expired_credentials_session(): void
+    {
+        $this->withSession([
+            'registration_success' => [
+                'email' => 'jemaat.expired@test.local',
+                'password' => 'TempPass123!',
+                'expires_at' => now()->subMinutes(1)->timestamp,
+            ],
+        ])->get(route('register.success'))
             ->assertRedirect(route('register'))
             ->assertSessionHas('error');
     }
