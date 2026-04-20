@@ -7,6 +7,7 @@ use App\Imports\MembersImport;
 use App\Models\Member;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -32,6 +33,7 @@ class MemberController extends Controller
             'status' => $request->string('status')->toString(),
             'gender' => $request->string('gender')->toString(),
             'age_category' => $request->string('age_category')->toString(),
+            'year' => $request->string('year')->toString(),
             'wilayah' => $request->string('wilayah')->toString(),
             'wilayah_field' => $wilayahField,
         ];
@@ -52,7 +54,17 @@ class MemberController extends Controller
                 ->all()
             : [];
 
-        return view('members.index', compact('members', 'wilayahField', 'wilayahOptions'));
+        $yearOptions = Member::query()
+            ->whereNotNull('created_at')
+            ->orderByDesc('created_at')
+            ->pluck('created_at')
+            ->map(fn ($createdAt) => Carbon::parse($createdAt)->year)
+            ->unique()
+            ->filter()
+            ->values()
+            ->all();
+
+        return view('members.index', compact('members', 'wilayahField', 'wilayahOptions', 'yearOptions'));
     }
 
     public function create()
@@ -121,6 +133,7 @@ class MemberController extends Controller
             'status' => $request->string('status')->toString(),
             'gender' => $request->string('gender')->toString(),
             'age_category' => $request->string('age_category')->toString(),
+            'year' => $request->string('year')->toString(),
             'wilayah' => $request->string('wilayah')->toString(),
             'wilayah_field' => $wilayahField,
         ]), 'data-jemaat.xlsx');

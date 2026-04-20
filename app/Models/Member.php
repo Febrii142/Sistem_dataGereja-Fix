@@ -48,6 +48,7 @@ class Member extends Model
             })
             ->when(! empty($filters['status']), fn (Builder $query) => $query->where('status', $filters['status']))
             ->when(! empty($filters['gender']), fn (Builder $query) => $query->where('jenis_kelamin', $filters['gender']))
+            ->when(! empty($filters['year']), fn (Builder $query) => $query->whereYear('created_at', $filters['year']))
             ->when(! empty($filters['age_category']), function (Builder $query) use ($filters) {
                 $today = Carbon::today();
 
