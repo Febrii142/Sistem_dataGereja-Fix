@@ -22,29 +22,33 @@
                 </a>
             @endif
             <nav class="space-y-2 text-sm">
-                @if($user->hasPermission('view_jemaat_dashboard'))
-                    @include('jemaat.layouts.sidebar')
-                @endif
-                @if($user->hasPermission('view_dashboard'))
-                    <a href="{{ route('dashboard') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('dashboard') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Dashboard</a>
-                @endif
-                @if($user->hasPermission('view_members'))
-                    <a href="{{ route('members.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('members.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Jemaat</a>
-                @endif
-                @if($user->hasPermission('view_categories'))
-                    <a href="{{ route('categories.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('categories.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Kategori</a>
-                @endif
-                @if($user->hasPermission('view_users'))
-                    <a href="{{ route('users.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('users.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">User Management</a>
-                @endif
-                @if($user->hasPermission('assign_roles'))
-                    <a href="{{ route('roles.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('roles.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Roles & Permissions</a>
-                @endif
-                @if($user->hasPermission('view_reports'))
-                    <a href="{{ route('reports.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('reports.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Laporan</a>
-                @endif
-                @if($user->hasPermission('view_settings'))
-                    <a href="{{ route('settings.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('settings.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Settings</a>
+                @if($user->hasRole(['Jemaat Gereja', 'jemaat']))
+                    <a href="{{ route('jemaat.dashboard') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('jemaat.dashboard') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Dashboard</a>
+                    <a href="{{ route('jemaat.profile') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('jemaat.profile*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Jemaat</a>
+                    <a href="{{ route('jemaat.keluarga.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('jemaat.keluarga*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Keanggotan</a>
+                    <a href="{{ route('jemaat.profile.edit') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('jemaat.profile.edit') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Settings</a>
+                @else
+                    @if($user->hasPermission('view_dashboard'))
+                        <a href="{{ route('dashboard') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('dashboard') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Dashboard</a>
+                    @endif
+                    @if($user->hasPermission('view_members'))
+                        <a href="{{ route('members.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('members.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Jemaat</a>
+                    @endif
+                    @if($user->hasPermission('view_categories'))
+                        <a href="{{ route('categories.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('categories.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Kategori</a>
+                    @endif
+                    @if($user->hasPermission('view_users'))
+                        <a href="{{ route('users.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('users.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">User Management</a>
+                    @endif
+                    @if($user->hasPermission('assign_roles'))
+                        <a href="{{ route('roles.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('roles.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Roles & Permissions</a>
+                    @endif
+                    @if($user->hasPermission('view_reports'))
+                        <a href="{{ route('reports.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('reports.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Laporan</a>
+                    @endif
+                    @if($user->hasPermission('view_settings'))
+                        <a href="{{ route('settings.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('settings.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Settings</a>
+                    @endif
                 @endif
             </nav>
             <form action="{{ route('logout') }}" method="post" class="mt-auto pt-6">

@@ -53,7 +53,17 @@ class RbacAccessTest extends TestCase
         $member = $this->createUserWithRole('Jemaat Gereja');
         $admin = $this->createUserWithRole('Admin');
 
-        $this->actingAs($member)->get(route('jemaat.dashboard'))->assertOk();
+        $this->actingAs($member)
+            ->get(route('jemaat.dashboard'))
+            ->assertOk()
+            ->assertSee('Dashboard')
+            ->assertSee('Jemaat')
+            ->assertSee('Keanggotan')
+            ->assertSee('Settings')
+            ->assertDontSee('Kategori')
+            ->assertDontSee('User Management')
+            ->assertDontSee('Roles & Permissions')
+            ->assertDontSee('Laporan');
         $this->actingAs($member)->get('/jemaat/profile')->assertOk();
         $this->actingAs($member)->get('/jemaat/family')->assertOk();
         $this->actingAs($member)->get(route('members.index'))->assertForbidden();
