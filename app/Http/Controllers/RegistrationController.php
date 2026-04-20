@@ -11,6 +11,7 @@ use App\Notifications\RegistrationCredentialsNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -88,7 +89,15 @@ class RegistrationController extends Controller
             return $user;
         });
 
-        $user->notify(new RegistrationCredentialsNotification($generatedPassword));
+        try {
+            Notification::send($user, new RegistrationCredentialsNotification($generatedPassword));
+        } catch (\Throwable $exception) {
+            Log::warning('Failed to send registration credentials email.', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'error' => $exception->getMessage(),
+            ]);
+        }
 
         $staffUsers = User::query()
             ->approved()
@@ -99,7 +108,15 @@ class RegistrationController extends Controller
             })
             ->get();
 
-        Notification::send($staffUsers, new NewRegistrationSubmittedNotification($user));
+        try {
+            Notification::send($staffUsers, new NewRegistrationSubmittedNotification($user));
+        } catch (\Throwable $exception) {
+            Log::warning('Failed to send staff notification for new registration.', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'error' => $exception->getMessage(),
+            ]);
+        }
 
         return redirect()
             ->route('login')

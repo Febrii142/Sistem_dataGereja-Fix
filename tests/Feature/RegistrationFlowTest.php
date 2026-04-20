@@ -86,6 +86,34 @@ class RegistrationFlowTest extends TestCase
         ])->assertForbidden();
     }
 
+    public function test_registration_still_succeeds_when_notification_dispatch_fails(): void
+    {
+        Notification::shouldReceive('send')
+            ->twice()
+            ->andThrow(new \RuntimeException('Too many emails per second'));
+
+        $this->post(route('register.store'), [
+            'name' => 'Jemaat Gagal Email',
+            'email' => 'jemaat.gagal-email@test.local',
+            'no_telepon' => '081211112222',
+            'jenis_kelamin' => 'L',
+            'tempat_lahir' => 'Bandung',
+            'tanggal_lahir' => '1998-02-10',
+            'alamat' => 'Jl. Kebaktian No. 2',
+            'kota' => 'Bandung',
+            'kode_pos' => '40111',
+            'status_baptis' => 'belum',
+            'kelas_katekisasi' => 'Dasar',
+        ])->assertRedirect(route('login'))
+            ->assertSessionHas('success');
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'jemaat.gagal-email@test.local',
+            'status' => 'pending',
+            'role' => 'jemaat',
+        ]);
+    }
+
     public function test_staff_can_approve_pending_registration(): void
     {
         Notification::fake();
