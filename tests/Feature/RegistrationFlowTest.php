@@ -50,7 +50,9 @@ class RegistrationFlowTest extends TestCase
             'baptism_status' => 'belum_dibaptis',
             'catechism_batch' => 'Gelombang 1 (Januari - April)',
             'parent_guardian_name' => 'Budi Santoso',
-        ])->assertRedirect(route('login'));
+        ])->assertRedirect(route('register.success'))
+            ->assertSessionHas('registration_success.email', 'jemaat.baru@test.local')
+            ->assertSessionHas('registration_success.password');
 
         $this->assertDatabaseHas('users', [
             'email' => 'jemaat.baru@test.local',
@@ -109,8 +111,9 @@ class RegistrationFlowTest extends TestCase
             'baptism_status' => 'sudah_dibaptis',
             'baptism_date' => '2015-08-17',
             'baptism_location' => 'Gereja Pusat Bandung',
-        ])->assertRedirect(route('login'))
-            ->assertSessionHas('success');
+        ])->assertRedirect(route('register.success'))
+            ->assertSessionHas('registration_success.email', 'jemaat.gagal-email@test.local')
+            ->assertSessionHas('registration_success.password');
 
         $this->assertDatabaseHas('users', [
             'email' => 'jemaat.gagal-email@test.local',
@@ -168,5 +171,43 @@ class RegistrationFlowTest extends TestCase
             'status' => 'approved',
         ]);
         Notification::assertSentTo($pendingUser->fresh(), RegistrationStatusUpdatedNotification::class);
+    }
+
+    public function test_registration_success_page_requires_temporary_session_data(): void
+    {
+        $this->get(route('register.success'))
+            ->assertRedirect(route('register'))
+            ->assertSessionHas('error');
+    }
+
+    public function test_registration_success_page_shows_credentials_and_clears_session_after_view(): void
+    {
+        $this->withSession([
+            'registration_success' => [
+                'email' => 'jemaat.success@test.local',
+                'password' => 'TempPass123!',
+                'expires_at' => now()->addMinutes(5)->timestamp,
+            ],
+        ])->get(route('register.success'))
+            ->assertOk()
+            ->assertSee('jemaat.success@test.local')
+            ->assertSee('TempPass123!');
+
+        $this->get(route('register.success'))
+            ->assertRedirect(route('register'))
+            ->assertSessionHas('error');
+    }
+
+    public function test_registration_success_page_rejects_expired_credentials_session(): void
+    {
+        $this->withSession([
+            'registration_success' => [
+                'email' => 'jemaat.expired@test.local',
+                'password' => 'TempPass123!',
+                'expires_at' => now()->subMinutes(1)->timestamp,
+            ],
+        ])->get(route('register.success'))
+            ->assertRedirect(route('register'))
+            ->assertSessionHas('error');
     }
 }
