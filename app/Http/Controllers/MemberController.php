@@ -7,7 +7,7 @@ use App\Imports\MembersImport;
 use App\Models\Member;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -54,12 +54,19 @@ class MemberController extends Controller
                 ->all()
             : [];
 
+        $driver = Member::query()->getModel()->getConnection()->getDriverName();
+        $yearExpression = match ($driver) {
+            'sqlite' => "CAST(strftime('%Y', created_at) AS INTEGER)",
+            'pgsql' => 'EXTRACT(YEAR FROM created_at)',
+            default => 'YEAR(created_at)',
+        };
+
         $yearOptions = Member::query()
             ->whereNotNull('created_at')
-            ->orderByDesc('created_at')
-            ->pluck('created_at')
-            ->map(fn ($createdAt) => Carbon::parse($createdAt)->year)
-            ->unique()
+            ->selectRaw("{$yearExpression} as year")
+            ->groupBy(DB::raw($yearExpression))
+            ->orderByRaw("{$yearExpression} desc")
+            ->pluck('year')
             ->filter()
             ->values()
             ->all();
