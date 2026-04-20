@@ -7,6 +7,7 @@ use App\Imports\MembersImport;
 use App\Models\Member;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -32,6 +33,7 @@ class MemberController extends Controller
             'status' => $request->string('status')->toString(),
             'gender' => $request->string('gender')->toString(),
             'age_category' => $request->string('age_category')->toString(),
+            'year' => $request->string('year')->toString(),
             'wilayah' => $request->string('wilayah')->toString(),
             'wilayah_field' => $wilayahField,
         ];
@@ -52,7 +54,24 @@ class MemberController extends Controller
                 ->all()
             : [];
 
-        return view('members.index', compact('members', 'wilayahField', 'wilayahOptions'));
+        $driver = Member::query()->getModel()->getConnection()->getDriverName();
+        $yearExpression = match ($driver) {
+            'sqlite' => "CAST(strftime('%Y', created_at) AS INTEGER)",
+            'pgsql' => 'EXTRACT(YEAR FROM created_at)',
+            default => 'YEAR(created_at)',
+        };
+
+        $yearOptions = Member::query()
+            ->whereNotNull('created_at')
+            ->selectRaw("{$yearExpression} as year")
+            ->groupBy(DB::raw($yearExpression))
+            ->orderByRaw("{$yearExpression} desc")
+            ->pluck('year')
+            ->filter()
+            ->values()
+            ->all();
+
+        return view('members.index', compact('members', 'wilayahField', 'wilayahOptions', 'yearOptions'));
     }
 
     public function create()
@@ -121,6 +140,7 @@ class MemberController extends Controller
             'status' => $request->string('status')->toString(),
             'gender' => $request->string('gender')->toString(),
             'age_category' => $request->string('age_category')->toString(),
+            'year' => $request->string('year')->toString(),
             'wilayah' => $request->string('wilayah')->toString(),
             'wilayah_field' => $wilayahField,
         ]), 'data-jemaat.xlsx');
