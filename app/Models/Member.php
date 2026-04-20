@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 class Member extends Model
@@ -18,6 +18,11 @@ class Member extends Model
         'tanggal_lahir',
         'jenis_kelamin',
         'pekerjaan',
+        'baptism_status',
+        'baptism_date',
+        'baptism_location',
+        'catechism_batch',
+        'parent_guardian_name',
     ];
 
     public function attendances()

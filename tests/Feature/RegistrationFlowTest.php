@@ -47,8 +47,9 @@ class RegistrationFlowTest extends TestCase
             'alamat' => 'Jl. Kebaktian No. 1',
             'kota' => 'Bandung',
             'kode_pos' => '40111',
-            'status_baptis' => 'belum',
-            'kelas_katekisasi' => 'Dasar',
+            'baptism_status' => 'belum_dibaptis',
+            'catechism_batch' => 'Gelombang 1 (Januari - April)',
+            'parent_guardian_name' => 'Budi Santoso',
         ])->assertRedirect(route('login'));
 
         $this->assertDatabaseHas('users', [
@@ -59,10 +60,13 @@ class RegistrationFlowTest extends TestCase
         $this->assertDatabaseHas('members', [
             'nama' => 'Jemaat Baru',
             'kontak' => '081212341234',
+            'baptism_status' => 'belum_dibaptis',
+            'catechism_batch' => 'Gelombang 1 (Januari - April)',
+            'parent_guardian_name' => 'Budi Santoso',
         ]);
         $this->assertDatabaseHas('jemaat', [
             'nama_lengkap' => 'Jemaat Baru',
-            'kelas_katekisasi' => 'Dasar',
+            'kelas_katekisasi' => 'Gelombang 1 (Januari - April)',
         ]);
 
         $newUser = User::query()->where('email', 'jemaat.baru@test.local')->firstOrFail();
@@ -102,8 +106,9 @@ class RegistrationFlowTest extends TestCase
             'alamat' => 'Jl. Kebaktian No. 2',
             'kota' => 'Bandung',
             'kode_pos' => '40111',
-            'status_baptis' => 'belum',
-            'kelas_katekisasi' => 'Dasar',
+            'baptism_status' => 'sudah_dibaptis',
+            'baptism_date' => '2015-08-17',
+            'baptism_location' => 'Gereja Pusat Bandung',
         ])->assertRedirect(route('login'))
             ->assertSessionHas('success');
 
@@ -112,6 +117,30 @@ class RegistrationFlowTest extends TestCase
             'status' => 'pending',
             'role' => 'jemaat',
         ]);
+        $this->assertDatabaseHas('members', [
+            'nama' => 'Jemaat Gagal Email',
+            'baptism_status' => 'sudah_dibaptis',
+            'baptism_location' => 'Gereja Pusat Bandung',
+        ]);
+    }
+
+    public function test_guest_registration_requires_catechism_data_when_not_baptized(): void
+    {
+        $this->from(route('register'))
+            ->post(route('register.store'), [
+                'name' => 'Jemaat Katekisasi',
+                'email' => 'jemaat.katekisasi@test.local',
+                'no_telepon' => '081212349999',
+                'jenis_kelamin' => 'P',
+                'tempat_lahir' => 'Jakarta',
+                'tanggal_lahir' => '2000-04-12',
+                'alamat' => 'Jl. Kasih No. 8',
+                'kota' => 'Jakarta',
+                'kode_pos' => '12345',
+                'baptism_status' => 'belum_dibaptis',
+            ])
+            ->assertRedirect(route('register'))
+            ->assertSessionHasErrors(['catechism_batch', 'parent_guardian_name']);
     }
 
     public function test_staff_can_approve_pending_registration(): void
