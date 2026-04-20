@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class RegistrationController extends Controller
@@ -40,6 +41,13 @@ class RegistrationController extends Controller
 
         $memberRoleId = Role::query()->where('name', 'Jemaat Gereja')->value('id')
             ?? Role::query()->where('name', 'Member')->value('id');
+
+        if (! $memberRoleId) {
+            throw ValidationException::withMessages([
+                'email' => 'Role jemaat belum tersedia. Silakan hubungi admin sistem.',
+            ]);
+        }
+
         $generatedPassword = Str::password(12);
 
         $user = DB::transaction(function () use ($validated, $memberRoleId, $generatedPassword) {
