@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -24,7 +25,7 @@ class User extends Authenticatable
         'jemaatgereja' => 'jemaat',
     ];
 
-    protected $fillable = ['name', 'email', 'password', 'role', 'role_id'];
+    protected $fillable = ['name', 'email', 'password', 'role', 'role_id', 'status'];
 
     protected $hidden = ['password', 'remember_token'];
 
@@ -56,6 +57,21 @@ class User extends Authenticatable
     public function jemaat(): HasOne
     {
         return $this->hasOne(Jemaat::class, 'user_id');
+    }
+
+    public function member(): HasOne
+    {
+        return $this->hasOne(Member::class, 'user_id');
+    }
+
+    public function scopePending(Builder $query): Builder
+    {
+        return $query->where('status', 'pending');
+    }
+
+    public function scopeApproved(Builder $query): Builder
+    {
+        return $query->where('status', 'approved');
     }
 
     public function hasPermission(string $permission): bool

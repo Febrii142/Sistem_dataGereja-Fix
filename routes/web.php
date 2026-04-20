@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\AdminApprovalController;
 use App\Http\Controllers\AnggotaKeluargaController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\JemaatDashboardController;
 use App\Http\Controllers\JemaatRegistrationController;
 use App\Http\Controllers\MemberController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -19,8 +21,8 @@ Route::redirect('/', '/dashboard');
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.attempt');
-    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-    Route::post('/register', [AuthController::class, 'register'])->name('register.store');
+    Route::get('/register', [RegistrationController::class, 'create'])->name('register');
+    Route::post('/register', [RegistrationController::class, 'store'])->name('register.store');
 });
 
 Route::middleware('auth')->group(function () {
@@ -56,6 +58,18 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('users', UserController::class)->except(['show']);
 
+    Route::prefix('admin/registrations')
+        ->middleware('permission:view_users')
+        ->group(function () {
+            Route::get('/pending', [AdminApprovalController::class, 'pending'])->name('admin.registrations.pending');
+            Route::post('/{user}/approve', [AdminApprovalController::class, 'approve'])
+                ->middleware('permission:edit_users')
+                ->name('admin.registrations.approve');
+            Route::post('/{user}/reject', [AdminApprovalController::class, 'reject'])
+                ->middleware('permission:edit_users')
+                ->name('admin.registrations.reject');
+        });
+
     Route::get('/roles', [RoleController::class, 'index'])
         ->middleware(['role:Admin', 'permission:assign_roles'])
         ->name('roles.index');
@@ -67,22 +81,22 @@ Route::middleware('auth')->group(function () {
             Route::get('/dashboard', [JemaatDashboardController::class, 'dashboard'])->name('dashboard');
             Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
             Route::get('/profile/show', [ProfileController::class, 'show'])->name('profile.show');
-            Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
-            Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
+            Route::get('/profile/edit', [ProfileController::class, 'edit'])->middleware('approved')->name('profile.edit');
+            Route::post('/profile', [ProfileController::class, 'update'])->middleware('approved')->name('profile.update');
             Route::get('/family', [JemaatDashboardController::class, 'family'])->name('family');
-            Route::post('/family/store', [JemaatDashboardController::class, 'storeFamily'])->name('family.store');
-            Route::post('/family/{id}/update', [JemaatDashboardController::class, 'updateFamily'])->name('family.update');
-            Route::delete('/family/{id}', [JemaatDashboardController::class, 'deleteFamily'])->name('family.delete');
+            Route::post('/family/store', [JemaatDashboardController::class, 'storeFamily'])->middleware('approved')->name('family.store');
+            Route::post('/family/{id}/update', [JemaatDashboardController::class, 'updateFamily'])->middleware('approved')->name('family.update');
+            Route::delete('/family/{id}', [JemaatDashboardController::class, 'deleteFamily'])->middleware('approved')->name('family.delete');
 
             Route::get('/registration/step/{step}', [JemaatRegistrationController::class, 'showStep'])->name('registration.show');
-            Route::post('/registration/step/{step}', [JemaatRegistrationController::class, 'saveStep'])->name('registration.save');
-            Route::post('/registration/draft', [JemaatRegistrationController::class, 'saveDraft'])->name('registration.draft');
+            Route::post('/registration/step/{step}', [JemaatRegistrationController::class, 'saveStep'])->middleware('approved')->name('registration.save');
+            Route::post('/registration/draft', [JemaatRegistrationController::class, 'saveDraft'])->middleware('approved')->name('registration.draft');
 
             Route::get('/keluarga', [AnggotaKeluargaController::class, 'index'])->name('keluarga.index');
-            Route::get('/keluarga/create', [AnggotaKeluargaController::class, 'create'])->name('keluarga.create');
-            Route::post('/keluarga', [AnggotaKeluargaController::class, 'store'])->name('keluarga.store');
-            Route::get('/keluarga/{id}/edit', [AnggotaKeluargaController::class, 'edit'])->name('keluarga.edit');
-            Route::put('/keluarga/{id}', [AnggotaKeluargaController::class, 'update'])->name('keluarga.update');
-            Route::delete('/keluarga/{id}', [AnggotaKeluargaController::class, 'destroy'])->name('keluarga.destroy');
+            Route::get('/keluarga/create', [AnggotaKeluargaController::class, 'create'])->middleware('approved')->name('keluarga.create');
+            Route::post('/keluarga', [AnggotaKeluargaController::class, 'store'])->middleware('approved')->name('keluarga.store');
+            Route::get('/keluarga/{id}/edit', [AnggotaKeluargaController::class, 'edit'])->middleware('approved')->name('keluarga.edit');
+            Route::put('/keluarga/{id}', [AnggotaKeluargaController::class, 'update'])->middleware('approved')->name('keluarga.update');
+            Route::delete('/keluarga/{id}', [AnggotaKeluargaController::class, 'destroy'])->middleware('approved')->name('keluarga.destroy');
         });
 });

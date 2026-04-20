@@ -11,6 +11,11 @@ class DashboardController extends Controller
     public function index()
     {
         if (auth()->check() && auth()->user()->hasRole(['Jemaat Gereja', 'jemaat'])) {
+            if (auth()->user()->status === 'pending') {
+                return redirect()->route('jemaat.dashboard')
+                    ->with('success', 'Akun Anda masih pending. Menunggu Approval dari Staff Gereja.');
+            }
+
             return redirect()->route('jemaat.dashboard');
         }
 
