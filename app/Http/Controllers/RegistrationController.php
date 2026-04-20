@@ -21,7 +21,7 @@ class RegistrationController extends Controller
 {
     public function create(): View
     {
-        return view('registration.create');
+        return view('auth.register');
     }
 
     public function store(Request $request): RedirectResponse
@@ -36,8 +36,11 @@ class RegistrationController extends Controller
             'alamat' => ['required', 'string', 'min:5'],
             'kota' => ['required', 'string', 'max:255'],
             'kode_pos' => ['required', 'string', 'max:10'],
-            'status_baptis' => ['required', 'in:sudah,belum'],
-            'kelas_katekisasi' => ['nullable', 'string', 'max:100'],
+            'baptism_status' => ['required', 'in:sudah_dibaptis,belum_dibaptis'],
+            'baptism_date' => ['nullable', 'date', 'before_or_equal:today'],
+            'baptism_location' => ['nullable', 'string', 'max:255'],
+            'catechism_batch' => ['nullable', 'required_if:baptism_status,belum_dibaptis', 'string', 'max:100'],
+            'parent_guardian_name' => ['nullable', 'required_if:baptism_status,belum_dibaptis', 'string', 'max:255'],
         ]);
 
         $memberRoleId = Role::query()->where('name', 'Jemaat Gereja')->value('id')
@@ -72,8 +75,11 @@ class RegistrationController extends Controller
                 'kode_pos' => $validated['kode_pos'],
                 'no_telepon' => $validated['no_telepon'],
                 'email' => $validated['email'],
-                'status_baptis' => $validated['status_baptis'],
-                'kelas_katekisasi' => $validated['kelas_katekisasi'] ?? null,
+                'status_baptis' => $validated['baptism_status'] === 'sudah_dibaptis' ? 'sudah' : 'belum',
+                'kelas_katekisasi' => $validated['catechism_batch'] ?? null,
+                'tanggal_baptis' => $validated['baptism_status'] === 'sudah_dibaptis'
+                    ? ($validated['baptism_date'] ?? null)
+                    : null,
             ]);
 
             Member::query()->create([
@@ -84,6 +90,19 @@ class RegistrationController extends Controller
                 'status' => 'aktif',
                 'tanggal_lahir' => $validated['tanggal_lahir'],
                 'jenis_kelamin' => $validated['jenis_kelamin'],
+                'baptism_status' => $validated['baptism_status'],
+                'baptism_date' => $validated['baptism_status'] === 'sudah_dibaptis'
+                    ? ($validated['baptism_date'] ?? null)
+                    : null,
+                'baptism_location' => $validated['baptism_status'] === 'sudah_dibaptis'
+                    ? ($validated['baptism_location'] ?? null)
+                    : null,
+                'catechism_batch' => $validated['baptism_status'] === 'belum_dibaptis'
+                    ? ($validated['catechism_batch'] ?? null)
+                    : null,
+                'parent_guardian_name' => $validated['baptism_status'] === 'belum_dibaptis'
+                    ? ($validated['parent_guardian_name'] ?? null)
+                    : null,
             ]);
 
             return $user;
