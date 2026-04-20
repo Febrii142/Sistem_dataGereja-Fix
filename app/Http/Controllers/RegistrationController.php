@@ -92,7 +92,7 @@ class RegistrationController extends Controller
         try {
             Notification::send($user, new RegistrationCredentialsNotification($generatedPassword));
         } catch (\Throwable $exception) {
-            Log::warning('Gagal mengirim email kredensial registrasi.', [
+            Log::warning('Failed to send registration credentials email.', [
                 'user_id' => $user->id,
                 'email' => $user->email,
                 'error' => $exception->getMessage(),
@@ -111,7 +111,7 @@ class RegistrationController extends Controller
         try {
             Notification::send($staffUsers, new NewRegistrationSubmittedNotification($user));
         } catch (\Throwable $exception) {
-            Log::warning('Gagal mengirim notifikasi staff atas registrasi baru.', [
+            Log::warning('Failed to send staff notification for new registration.', [
                 'user_id' => $user->id,
                 'email' => $user->email,
                 'error' => $exception->getMessage(),

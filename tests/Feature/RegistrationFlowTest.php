@@ -89,8 +89,7 @@ class RegistrationFlowTest extends TestCase
     public function test_registration_still_succeeds_when_notification_dispatch_fails(): void
     {
         Notification::shouldReceive('send')
-            ->atLeast()
-            ->once()
+            ->twice()
             ->andThrow(new \RuntimeException('Too many emails per second'));
 
         $this->post(route('register.store'), [
