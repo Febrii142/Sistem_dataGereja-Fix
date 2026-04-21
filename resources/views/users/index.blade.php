@@ -43,15 +43,6 @@
                         ->take(2)
                         ->map(fn (string $part) => \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($part, 0, 1)))
                         ->join('');
-                    $normalizedRole = \Illuminate\Support\Str::lower(\Illuminate\Support\Str::replace(' ', '', (string) $user->role_name));
-                    $roleLabel = match (true) {
-                        str_contains($normalizedRole, 'admin') => 'Admin',
-                        str_contains($normalizedRole, 'koordinator'), str_contains($normalizedRole, 'staff') => 'Staff',
-                        default => ucfirst((string) $user->role_name),
-                    };
-                    $roleBadgeClass = $roleLabel === 'Admin'
-                        ? 'bg-blue-100 text-blue-700'
-                        : 'bg-teal-100 text-teal-700';
                 @endphp
                 <article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
                     <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
@@ -63,7 +54,7 @@
                                 <h4 class="text-base font-semibold text-slate-900">{{ $user->name }}</h4>
                                 <p class="text-sm text-slate-500">{{ $user->email }}</p>
                                 <div class="mt-1 flex flex-wrap items-center gap-2">
-                                    <span class="rounded-full px-2 py-1 text-xs font-semibold {{ $roleBadgeClass }}">{{ $roleLabel }}</span>
+                                    <span class="rounded-full px-2 py-1 text-xs font-semibold {{ $user->role_badge_class }}">{{ $user->role_display_label }}</span>
                                     <span class="text-xs text-slate-500">Last active: {{ $user->last_active ?? 'Belum tercatat' }}</span>
                                 </div>
                             </div>
@@ -72,7 +63,7 @@
                             <summary class="cursor-pointer list-none rounded-lg bg-slate-100 px-2 py-1 text-slate-600 hover:bg-slate-200">⋯</summary>
                             <div class="absolute right-0 z-10 mt-2 w-36 rounded-lg border border-slate-200 bg-white p-1 text-sm shadow-lg">
                                 <a href="{{ route('users.edit', $user) }}" class="block rounded px-2 py-1 text-slate-700 hover:bg-slate-100">Edit</a>
-                                <a href="{{ route('users.edit', $user) }}" class="block rounded px-2 py-1 text-slate-700 hover:bg-slate-100">Change Role</a>
+                                <a href="{{ route('users.edit', ['user' => $user, 'focus' => 'role']) }}" class="block rounded px-2 py-1 text-slate-700 hover:bg-slate-100">Change Role</a>
                                 <form method="post" action="{{ route('users.destroy', $user) }}">
                                     @csrf
                                     @method('DELETE')

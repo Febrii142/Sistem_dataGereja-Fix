@@ -22,7 +22,7 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        $search = trim((string) $request->string('search')->toString());
+        $search = $request->string('search')->trim()->toString();
 
         $usersQuery = User::query()
             ->with('role')
@@ -46,13 +46,7 @@ class UserController extends Controller
             'totalUsers' => User::query()->adminAndStaff()->count(),
             'adminRolesCount' => User::query()
                 ->adminAndStaff()
-                ->where(function (Builder $query): void {
-                    $query
-                        ->whereRaw("lower(replace(role, ' ', '')) in (?, ?, ?)", ['admin', 'superadmin', 'super_admin'])
-                        ->orWhereHas('role', function (Builder $roleQuery): void {
-                            $roleQuery->whereIn('name', ['Admin', 'Super Admin']);
-                        });
-                })
+                ->adminRoles()
                 ->count(),
             'roles' => $this->assignableRoles()->get(),
             'search' => $search,
@@ -71,7 +65,7 @@ class UserController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:users,email'],
-            'role_id' => ['required', Rule::exists('roles', 'id')->whereIn('name', ['Admin', 'Super Admin', 'Staff'])],
+            'role_id' => ['required', Rule::exists('roles', 'id')->whereIn('name', User::ASSIGNABLE_ROLE_NAMES)],
             'password' => ['required', 'confirmed', 'min:8'],
         ]);
 
@@ -101,7 +95,7 @@ class UserController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:users,email,'.$user->id],
-            'role_id' => ['required', Rule::exists('roles', 'id')->whereIn('name', ['Admin', 'Super Admin', 'Staff'])],
+            'role_id' => ['required', Rule::exists('roles', 'id')->whereIn('name', User::ASSIGNABLE_ROLE_NAMES)],
             'password' => ['nullable', 'confirmed', 'min:8'],
         ]);
 
@@ -148,7 +142,7 @@ class UserController extends Controller
     private function assignableRoles(): Builder
     {
         return Role::query()
-            ->whereIn('name', ['Admin', 'Super Admin', 'Staff'])
+            ->whereIn('name', User::ASSIGNABLE_ROLE_NAMES)
             ->orderByRaw("
                 case name
                     when 'Super Admin' then 0
