@@ -9,6 +9,8 @@ use Illuminate\Support\Carbon;
 
 class Member extends Model
 {
+    public const STATUSES = ['aktif', 'tidak_aktif', 'pindah'];
+
     protected $fillable = [
         'user_id',
         'nama',

@@ -10,6 +10,8 @@ use Illuminate\Support\Carbon;
 
 class ReportController extends Controller
 {
+    private const REPORT_PAGE_SIZE = 10;
+
     public function __construct()
     {
         $this->middleware('permission:view_reports')->only(['index']);
@@ -19,11 +21,17 @@ class ReportController extends Controller
     public function index(Request $request)
     {
         $filters = $this->getFilterState($request);
+        $activeTab = $filters['tab'] === 'status' ? 'status' : 'demografi';
         $membersQuery = $this->buildFilteredMembersQuery($filters);
+        $statusMembersQuery = $this->buildStatusMembersQuery($filters);
 
         $members = (clone $membersQuery)
             ->orderBy('nama')
-            ->paginate(10)
+            ->paginate(self::REPORT_PAGE_SIZE)
+            ->withQueryString();
+        $statusMembers = (clone $statusMembersQuery)
+            ->orderBy('nama')
+            ->paginate(self::REPORT_PAGE_SIZE, ['*'], 'status_page')
             ->withQueryString();
 
         $totalResults = (clone $membersQuery)->count();
@@ -44,19 +52,35 @@ class ReportController extends Controller
             : ($currentMonthCount > 0 ? 100.0 : 0.0);
 
         $distribution = (clone $membersQuery)
-            ->selectRaw('status as label, COUNT(*) as total')
+            ->selectRaw('status, COUNT(*) as total')
             ->groupBy('status')
             ->get()
             ->map(function ($item) use ($totalResults) {
-                $label = $item->label === 'aktif' ? 'Sektor Aktif' : 'Sektor Tidak Aktif';
+                $formattedLabel = 'Status '.$this->statusLabel($item->status);
                 $percentage = $totalResults > 0 ? round(($item->total / $totalResults) * 100, 1) : 0;
 
                 return (object) [
-                    'label' => $label,
+                    'label' => $formattedLabel,
                     'total' => $item->total,
                     'percentage' => $percentage,
                 ];
             });
+
+        $statusTotals = Member::query()
+            ->selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+        $statusGrandTotal = (int) $statusTotals->sum();
+        $statusSummary = collect(Member::STATUSES)->map(function (string $status) use ($statusTotals, $statusGrandTotal) {
+            $total = (int) ($statusTotals[$status] ?? 0);
+
+            return (object) [
+                'status' => $status,
+                'label' => $this->statusLabel($status),
+                'total' => $total,
+                'percentage' => $statusGrandTotal > 0 ? round(($total / $statusGrandTotal) * 100, 1) : 0,
+            ];
+        });
 
         $filterOptions = [
             'ageRanges' => [
@@ -79,17 +103,53 @@ class ReportController extends Controller
 
         return view('reports.index', compact(
             'members',
+            'statusMembers',
             'filters',
+            'activeTab',
             'filterOptions',
             'totalResults',
             'percentageChange',
-            'distribution'
+            'distribution',
+            'statusSummary'
         ));
     }
 
     public function exportPdf(Request $request)
     {
         $filters = $this->getFilterState($request);
+        $activeTab = $filters['tab'] === 'status' ? 'status' : 'demografi';
+
+        if ($activeTab === 'status') {
+            $members = $this->buildStatusMembersQuery($filters)
+                ->orderBy('nama')
+                ->get();
+
+            $statusTotals = Member::query()
+                ->selectRaw('status, COUNT(*) as total')
+                ->groupBy('status')
+                ->pluck('total', 'status');
+            $statusGrandTotal = (int) $statusTotals->sum();
+            $statusSummary = collect(Member::STATUSES)->map(function (string $status) use ($statusTotals, $statusGrandTotal) {
+                $total = (int) ($statusTotals[$status] ?? 0);
+
+                return (object) [
+                    'status' => $status,
+                    'label' => $this->statusLabel($status),
+                    'total' => $total,
+                    'percentage' => $statusGrandTotal > 0 ? round(($total / $statusGrandTotal) * 100, 1) : 0,
+                ];
+            });
+
+            $pdf = Pdf::loadView('reports.pdf', [
+                'members' => $members,
+                'filters' => $filters,
+                'activeTab' => $activeTab,
+                'statusSummary' => $statusSummary,
+            ]);
+
+            return $pdf->download('laporan-status-jemaat.pdf');
+        }
+
         $filterLabels = $this->mapFilterLabels($filters);
         $membersQuery = $this->buildFilteredMembersQuery($filters);
 
@@ -102,11 +162,11 @@ class ReportController extends Controller
         $distribution = $members
             ->groupBy('status')
             ->map(function ($items, $status) use ($totalResults) {
-                $label = $status === 'aktif' ? 'Sektor Aktif' : 'Sektor Tidak Aktif';
+                $formattedLabel = 'Status '.$this->statusLabel($status);
                 $count = $items->count();
 
                 return (object) [
-                    'label' => $label,
+                    'label' => $formattedLabel,
                     'total' => $count,
                     'percentage' => $totalResults > 0 ? round(($count / $totalResults) * 100, 1) : 0,
                 ];
@@ -116,6 +176,7 @@ class ReportController extends Controller
         $pdf = Pdf::loadView('reports.pdf', [
             'members' => $members,
             'filters' => $filters,
+            'activeTab' => $activeTab,
             'filterLabels' => $filterLabels,
             'totalResults' => $totalResults,
             'distribution' => $distribution,
@@ -127,7 +188,9 @@ class ReportController extends Controller
     private function getFilterState(Request $request): array
     {
         return [
+            'tab' => $request->string('tab')->toString(),
             'search' => $request->string('search')->toString(),
+            'status' => $request->string('status')->toString(),
             'age_range' => $request->string('age_range')->toString(),
             'gender' => $request->string('gender')->toString(),
             'birthday_month' => $request->string('birthday_month')->toString(),
@@ -144,6 +207,10 @@ class ReportController extends Controller
 
         $query->when($filters['gender'] !== '', function (Builder $query) use ($filters) {
             $query->where('jenis_kelamin', $filters['gender']);
+        });
+
+        $query->when($filters['status'] !== '', function (Builder $query) use ($filters) {
+            $query->where('status', $filters['status']);
         });
 
         $query->when($filters['birthday_month'] !== '', function (Builder $query) use ($filters) {
@@ -172,6 +239,32 @@ class ReportController extends Controller
         });
 
         return $query;
+    }
+
+    private function buildStatusMembersQuery(array $filters): Builder
+    {
+        return Member::query()
+            ->when($filters['search'] !== '', function (Builder $query) use ($filters) {
+                $search = $filters['search'];
+                $query->where(function (Builder $query) use ($search) {
+                    $query->where('nama', 'like', '%'.$search.'%')
+                        ->orWhere('kontak', 'like', '%'.$search.'%')
+                        ->orWhere('alamat', 'like', '%'.$search.'%');
+                });
+            })
+            ->when($filters['status'] !== '', function (Builder $query) use ($filters) {
+                $query->where('status', $filters['status']);
+            });
+    }
+
+    private function statusLabel(string $status): string
+    {
+        return match ($status) {
+            'aktif' => 'Aktif',
+            'tidak_aktif' => 'Tidak Aktif',
+            'pindah' => 'Pindah',
+            default => ucfirst(str_replace('_', ' ', $status)),
+        };
     }
 
     private function mapFilterLabels(array $filters): array

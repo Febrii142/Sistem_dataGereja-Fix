@@ -185,4 +185,72 @@ class MemberFilterTest extends TestCase
             return $export->collection()->pluck('nama')->all() === ['Jemaat Tahun 2024'];
         });
     }
+
+    public function test_staff_can_update_member_status_to_pindah(): void
+    {
+        $this->seed([
+            PermissionSeeder::class,
+            RoleSeeder::class,
+        ]);
+
+        $user = User::factory()->create([
+            'role_id' => Role::query()->where('name', 'Staff')->value('id'),
+            'role' => 'koordinator',
+        ]);
+
+        $member = Member::create([
+            'nama' => 'Jemaat Status',
+            'alamat' => 'Alamat Status',
+            'kontak' => '0817',
+            'status' => 'aktif',
+            'tanggal_lahir' => now()->subYears(20)->toDateString(),
+            'jenis_kelamin' => 'L',
+            'pekerjaan' => null,
+        ]);
+
+        $response = $this->actingAs($user)->patch(route('members.update-status', $member), [
+            'status' => 'pindah',
+        ]);
+
+        $response->assertRedirect(route('members.index'));
+        $response->assertSessionHas('success', 'Status jemaat berhasil diperbarui.');
+        $this->assertDatabaseHas('members', [
+            'id' => $member->id,
+            'status' => 'pindah',
+        ]);
+    }
+
+    public function test_user_without_edit_members_permission_cannot_update_member_status(): void
+    {
+        $this->seed([
+            PermissionSeeder::class,
+            RoleSeeder::class,
+        ]);
+
+        $user = User::factory()->create([
+            'role_id' => Role::query()->where('name', 'Pendeta')->value('id'),
+            'role' => 'pendeta',
+        ]);
+
+        $member = Member::create([
+            'nama' => 'Jemaat Non Edit',
+            'alamat' => 'Alamat Non Edit',
+            'kontak' => '0818',
+            'status' => 'aktif',
+            'tanggal_lahir' => now()->subYears(22)->toDateString(),
+            'jenis_kelamin' => 'P',
+            'pekerjaan' => null,
+        ]);
+
+        $this->actingAs($user)
+            ->patch(route('members.update-status', $member), [
+                'status' => 'tidak_aktif',
+            ])
+            ->assertForbidden();
+
+        $this->assertDatabaseHas('members', [
+            'id' => $member->id,
+            'status' => 'aktif',
+        ]);
+    }
 }

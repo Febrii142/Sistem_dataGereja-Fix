@@ -10,6 +10,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 
 class MemberController extends Controller
@@ -18,7 +19,7 @@ class MemberController extends Controller
     {
         $this->middleware('permission:view_members')->only(['index', 'show']);
         $this->middleware('permission:create_members')->only(['create', 'store']);
-        $this->middleware('permission:edit_members')->only(['edit', 'update']);
+        $this->middleware('permission:edit_members')->only(['edit', 'update', 'updateStatus']);
         $this->middleware('permission:delete_members')->only(['destroy']);
         $this->middleware('permission:export_members')->only(['exportExcel', 'exportPdf']);
         $this->middleware('permission:import_members')->only(['import']);
@@ -90,7 +91,7 @@ class MemberController extends Controller
             'nama' => ['required', 'string', 'max:255'],
             'alamat' => ['required', 'string'],
             'kontak' => ['required', 'string', 'max:30'],
-            'status' => ['required', 'in:aktif,tidak_aktif'],
+            'status' => ['required', Rule::in(Member::STATUSES)],
             'tanggal_lahir' => ['required', 'date'],
             'jenis_kelamin' => ['required', 'in:L,P'],
             'pekerjaan' => ['nullable', 'string', 'max:255'],
@@ -117,7 +118,7 @@ class MemberController extends Controller
             'nama' => ['required', 'string', 'max:255'],
             'alamat' => ['required', 'string'],
             'kontak' => ['required', 'string', 'max:30'],
-            'status' => ['required', 'in:aktif,tidak_aktif'],
+            'status' => ['required', Rule::in(Member::STATUSES)],
             'tanggal_lahir' => ['required', 'date'],
             'jenis_kelamin' => ['required', 'in:L,P'],
             'pekerjaan' => ['nullable', 'string', 'max:255'],
@@ -133,6 +134,18 @@ class MemberController extends Controller
         $member->delete();
 
         return back()->with('success', 'Data jemaat berhasil dihapus.');
+    }
+
+    public function updateStatus(Request $request, Member $member)
+    {
+        $data = $request->validate([
+            'status' => ['required', Rule::in(Member::STATUSES)],
+        ]);
+
+        $member->update($data);
+
+        return redirect()->route('members.index')
+            ->with('success', 'Status jemaat berhasil diperbarui.');
     }
 
     public function exportExcel(Request $request)

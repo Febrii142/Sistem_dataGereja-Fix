@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Laporan Analisis Demografi</title>
+    <title>{{ ($activeTab ?? 'demografi') === 'status' ? 'Laporan Status Jemaat' : 'Laporan Analisis Demografi' }}</title>
     <style>
         body { font-family: DejaVu Sans, sans-serif; font-size: 12px; color: #1f2937; }
         h2 { margin: 0 0 6px; }
@@ -16,46 +16,88 @@
     </style>
 </head>
 <body>
-    <h2>ANALISIS DEMOGRAFI JEMAAT</h2>
-    <p class="muted">Filter: Rentang Usia {{ $filterLabels['age_range'] }}, Gender {{ $filterLabels['gender'] }}, Bulan Ulang Tahun {{ $filterLabels['birthday_month'] }}</p>
+    @if(($activeTab ?? 'demografi') === 'status')
+        <h2>LAPORAN STATUS JEMAAT</h2>
+        <p class="muted">Filter status: {{ ($filters['status'] ?? '') === '' ? 'Semua' : (($filters['status'] ?? '') === 'tidak_aktif' ? 'Tidak Aktif' : ucfirst(str_replace('_', ' ', $filters['status'] ?? ''))) }}</p>
 
-    <div class="card">
-        <strong>Total Hasil Filter:</strong> {{ number_format($totalResults) }} jemaat
-    </div>
-
-    <p class="section-title">Distribusi Sektor</p>
-    <ul>
-        @forelse($distribution as $item)
-            <li>{{ $item->label }}: {{ $item->total }} ({{ $item->percentage }}%)</li>
-        @empty
-            <li>Tidak ada data distribusi.</li>
-        @endforelse
-    </ul>
-
-    <p class="section-title">Direktori Hasil</p>
-    <table>
-        <thead>
-            <tr>
-                <th>NAMA LENGKAP</th>
-                <th>USIA</th>
-                <th>L/P</th>
-                <th>TGL LAHIR</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($members as $member)
-                <tr>
-                    <td>{{ $member->nama }}</td>
-                    <td>{{ $member->tanggal_lahir ? \Illuminate\Support\Carbon::parse($member->tanggal_lahir)->age : '-' }}</td>
-                    <td>{{ $member->jenis_kelamin }}</td>
-                    <td>{{ $member->tanggal_lahir ? \Illuminate\Support\Carbon::parse($member->tanggal_lahir)->format('d-m-Y') : '-' }}</td>
-                </tr>
+        <p class="section-title">Ringkasan Status</p>
+        <ul>
+            @forelse($statusSummary ?? [] as $item)
+                <li>{{ $item->label }}: {{ $item->total }} ({{ $item->percentage }}%)</li>
             @empty
-                <tr>
-                    <td colspan="4">Tidak ada data sesuai filter.</td>
-                </tr>
+                <li>Tidak ada data status.</li>
             @endforelse
-        </tbody>
-    </table>
+        </ul>
+
+        <p class="section-title">Daftar Jemaat Berdasarkan Status</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>NAMA</th>
+                    <th>KONTAK</th>
+                    <th>ALAMAT</th>
+                    <th>STATUS</th>
+                    <th>TANGGAL UPDATE</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($members as $member)
+                    <tr>
+                        <td>{{ $member->nama }}</td>
+                        <td>{{ $member->kontak }}</td>
+                        <td>{{ $member->alamat }}</td>
+                        <td>{{ $member->status === 'tidak_aktif' ? 'Tidak Aktif' : ucfirst(str_replace('_', ' ', $member->status)) }}</td>
+                        <td>{{ $member->updated_at?->format('d-m-Y') ?? '-' }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="5">Tidak ada data sesuai filter.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    @else
+        <h2>ANALISIS DEMOGRAFI JEMAAT</h2>
+        <p class="muted">Filter: Rentang Usia {{ $filterLabels['age_range'] }}, Gender {{ $filterLabels['gender'] }}, Bulan Ulang Tahun {{ $filterLabels['birthday_month'] }}</p>
+
+        <div class="card">
+            <strong>Total Hasil Filter:</strong> {{ number_format($totalResults) }} jemaat
+        </div>
+
+        <p class="section-title">Distribusi Sektor</p>
+        <ul>
+            @forelse($distribution as $item)
+                <li>{{ $item->label }}: {{ $item->total }} ({{ $item->percentage }}%)</li>
+            @empty
+                <li>Tidak ada data distribusi.</li>
+            @endforelse
+        </ul>
+
+        <p class="section-title">Direktori Hasil</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>NAMA LENGKAP</th>
+                    <th>USIA</th>
+                    <th>L/P</th>
+                    <th>TGL LAHIR</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($members as $member)
+                    <tr>
+                        <td>{{ $member->nama }}</td>
+                        <td>{{ $member->tanggal_lahir ? \Illuminate\Support\Carbon::parse($member->tanggal_lahir)->age : '-' }}</td>
+                        <td>{{ $member->jenis_kelamin }}</td>
+                        <td>{{ $member->tanggal_lahir ? \Illuminate\Support\Carbon::parse($member->tanggal_lahir)->format('d-m-Y') : '-' }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="4">Tidak ada data sesuai filter.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    @endif
 </body>
 </html>
