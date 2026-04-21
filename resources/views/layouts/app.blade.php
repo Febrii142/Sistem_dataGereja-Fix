@@ -40,9 +40,6 @@
                     @if($user->hasPermission('view_users'))
                         <a href="{{ route('users.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('users.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">User Management</a>
                     @endif
-                    @if($user->hasPermission('assign_roles'))
-                        <a href="{{ route('roles.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('roles.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Roles & Permissions</a>
-                    @endif
                     @if($user->hasPermission('view_reports'))
                         <a href="{{ route('reports.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('reports.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Laporan</a>
                     @endif

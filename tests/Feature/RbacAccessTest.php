@@ -36,6 +36,9 @@ class RbacAccessTest extends TestCase
     {
         $admin = $this->createUserWithRole('Admin');
 
+        $this->actingAs($admin)->get(route('dashboard'))
+            ->assertOk()
+            ->assertDontSee(route('roles.index'), false);
         $this->actingAs($admin)->get(route('users.index'))->assertOk();
         $this->actingAs($admin)->get(route('roles.index'))->assertOk();
     }
