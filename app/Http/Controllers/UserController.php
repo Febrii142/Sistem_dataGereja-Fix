@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Role;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -17,17 +20,49 @@ class UserController extends Controller
         $this->middleware('permission:delete_users')->only(['destroy']);
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        $search = trim((string) $request->string('search')->toString());
+
+        $usersQuery = User::query()
+            ->with('role')
+            ->adminAndStaff()
+            ->addSelect([
+                'last_activity_at' => DB::table('sessions')
+                    ->selectRaw('MAX(last_activity)')
+                    ->whereColumn('user_id', 'users.id'),
+            ]);
+
+        if ($search !== '') {
+            $usersQuery->where(function (Builder $query) use ($search): void {
+                $query
+                    ->where('name', 'like', '%'.$search.'%')
+                    ->orWhere('email', 'like', '%'.$search.'%');
+            });
+        }
+
         return view('users.index', [
-            'users' => User::query()->with('role')->latest()->paginate(10),
+            'users' => $usersQuery->latest()->paginate(12)->withQueryString(),
+            'totalUsers' => User::query()->adminAndStaff()->count(),
+            'adminRolesCount' => User::query()
+                ->adminAndStaff()
+                ->where(function (Builder $query): void {
+                    $query
+                        ->whereRaw("lower(replace(role, ' ', '')) in (?, ?, ?)", ['admin', 'superadmin', 'super_admin'])
+                        ->orWhereHas('role', function (Builder $roleQuery): void {
+                            $roleQuery->whereIn('name', ['Admin', 'Super Admin']);
+                        });
+                })
+                ->count(),
+            'roles' => $this->assignableRoles()->get(),
+            'search' => $search,
         ]);
     }
 
     public function create()
     {
         return view('users.create', [
-            'roles' => Role::query()->orderBy('name')->get(),
+            'roles' => $this->assignableRoles()->get(),
         ]);
     }
 
@@ -36,7 +71,7 @@ class UserController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:users,email'],
-            'role_id' => ['required', 'exists:roles,id'],
+            'role_id' => ['required', Rule::exists('roles', 'id')->whereIn('name', ['Admin', 'Super Admin', 'Staff'])],
             'password' => ['required', 'confirmed', 'min:8'],
         ]);
 
@@ -57,7 +92,7 @@ class UserController extends Controller
     {
         return view('users.edit', [
             'user' => $user->load('role'),
-            'roles' => Role::query()->orderBy('name')->get(),
+            'roles' => $this->assignableRoles()->get(),
         ]);
     }
 
@@ -66,7 +101,7 @@ class UserController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:users,email,'.$user->id],
-            'role_id' => ['required', 'exists:roles,id'],
+            'role_id' => ['required', Rule::exists('roles', 'id')->whereIn('name', ['Admin', 'Super Admin', 'Staff'])],
             'password' => ['nullable', 'confirmed', 'min:8'],
         ]);
 
@@ -102,10 +137,25 @@ class UserController extends Controller
     {
         return match (Role::query()->findOrFail($roleId)->name) {
             'Admin' => 'admin',
+            'Super Admin' => 'admin',
             'Pendeta' => 'pendeta',
             'Staff' => 'koordinator',
             'Jemaat Gereja' => 'jemaat',
             default => 'user',
         };
+    }
+
+    private function assignableRoles(): Builder
+    {
+        return Role::query()
+            ->whereIn('name', ['Admin', 'Super Admin', 'Staff'])
+            ->orderByRaw("
+                case name
+                    when 'Super Admin' then 0
+                    when 'Admin' then 1
+                    when 'Staff' then 2
+                    else 99
+                end
+            ");
     }
 }

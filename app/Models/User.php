@@ -3,13 +3,15 @@
 namespace App\Models;
 
 use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class User extends Authenticatable
 {
@@ -74,6 +76,22 @@ class User extends Authenticatable
         return $query->where('status', 'approved');
     }
 
+    public function scopeAdminAndStaff(Builder $query): Builder
+    {
+        return $query
+            ->approved()
+            ->where(function (Builder $builder): void {
+                $builder
+                    ->whereRaw(
+                        "lower(replace(role, ' ', '')) in (?, ?, ?, ?, ?)",
+                        ['admin', 'superadmin', 'super_admin', 'staff', 'koordinator']
+                    )
+                    ->orWhereHas('role', function (Builder $roleQuery): void {
+                        $roleQuery->whereIn('name', ['Admin', 'Super Admin', 'Staff']);
+                    });
+            });
+    }
+
     public function hasPermission(string $permission): bool
     {
         if ($this->hasRole('Admin')) {
@@ -129,5 +147,22 @@ class User extends Authenticatable
     public function getRoleNameAttribute(): ?string
     {
         return $this->getAttribute('role');
+    }
+
+    public function getLastActiveAttribute(): ?string
+    {
+        $lastActivity = $this->getAttribute('last_activity_at');
+
+        if ($lastActivity === null) {
+            $lastActivity = DB::table('sessions')
+                ->where('user_id', $this->getKey())
+                ->max('last_activity');
+        }
+
+        if (empty($lastActivity)) {
+            return null;
+        }
+
+        return Carbon::createFromTimestamp((int) $lastActivity)->diffForHumans();
     }
 }
