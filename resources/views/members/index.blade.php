@@ -3,13 +3,19 @@
 <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
     <div>
         <h2 class="text-2xl font-bold text-slate-800">Data Jemaat</h2>
-        <p class="text-sm text-slate-500">Kelola data jemaat, export, dan import data.</p>
+        <p class="text-sm text-slate-500">Kelola data jemaat dan impor data.</p>
         <p class="mt-1 text-sm font-medium text-slate-600">Total jemaat: {{ $members->total() }}</p>
     </div>
-    <div class="flex flex-wrap gap-2 text-sm">
-        <a class="rounded-lg bg-[#1e40af] px-3 py-2 text-white hover:bg-[#1d4ed8]" href="{{ route('members.create') }}">Tambah</a>
-        <a class="rounded-lg bg-emerald-600 px-3 py-2 text-white hover:bg-emerald-700" href="{{ route('members.export.excel', request()->query()) }}">Excel</a>
-        <a class="rounded-lg bg-rose-600 px-3 py-2 text-white hover:bg-rose-700" href="{{ route('members.export.pdf') }}">PDF</a>
+</div>
+<div class="mb-4 rounded-xl bg-[#1e40af] p-5 text-white shadow-sm">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+            <h3 class="text-lg font-semibold">Verifikasi Jemaat Baru</h3>
+            <p class="mt-1 text-sm text-blue-100">Ada {{ $pendingRegistrationsCount }} pendaftaran baru yang memerlukan peninjauan administratif.</p>
+        </div>
+        @if(auth()->user()?->hasPermission('view_users'))
+            <a href="{{ route('members.verification.index') }}" class="rounded-lg bg-white px-3 py-2 text-sm font-semibold text-[#1e40af] hover:bg-slate-100">Lihat Antrean</a>
+        @endif
     </div>
 </div>
 <form method="get" class="mb-4 grid gap-2 rounded-xl bg-white p-4 shadow-sm md:grid-cols-7">

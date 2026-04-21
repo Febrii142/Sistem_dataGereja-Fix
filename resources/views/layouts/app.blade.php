@@ -16,11 +16,6 @@
     <div class="min-h-screen lg:grid lg:grid-cols-[260px_1fr]">
         <aside class="flex flex-col bg-[#1e40af] p-4 text-white">
             <h1 class="mb-6 text-xl font-bold">SIM Jemaat</h1>
-            @if($user->hasPermission('create_members'))
-                <a href="{{ route('members.create') }}" class="mb-4 inline-flex items-center justify-center rounded-lg bg-white px-3 py-2 text-sm font-semibold text-[#1e40af] hover:bg-slate-100">
-                    + Tambah Data Baru
-                </a>
-            @endif
             <nav class="space-y-2 text-sm">
                 @if($user->hasRole(['Jemaat Gereja', 'jemaat']))
                     <a href="{{ route('jemaat.dashboard') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('jemaat.dashboard') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Dashboard</a>
@@ -36,12 +31,14 @@
                     @if($user->hasPermission('view_members'))
                         <a href="{{ route('members.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('members.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Jemaat</a>
                     @endif
+                    @if($user->hasPermission('view_users'))
+                        <a href="{{ route('members.verification.index') }}" class="ml-3 block rounded-lg px-3 py-2 {{ request()->routeIs('members.verification.*', 'admin.registrations.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">↳ Verifikasi Jemaat Baru</a>
+                    @endif
                     @if($user->hasPermission('view_categories'))
                         <a href="{{ route('categories.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('categories.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Kategori</a>
                     @endif
                     @if($user->hasPermission('view_users'))
                         <a href="{{ route('users.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('users.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">User Management</a>
-                        <a href="{{ route('admin.registrations.pending') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('admin.registrations.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Approval Registrasi</a>
                     @endif
                     @if($user->hasPermission('assign_roles'))
                         <a href="{{ route('roles.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('roles.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Roles & Permissions</a>

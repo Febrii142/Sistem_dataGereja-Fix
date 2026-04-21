@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\MembersExport;
 use App\Imports\MembersImport;
 use App\Models\Member;
+use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -71,7 +72,11 @@ class MemberController extends Controller
             ->values()
             ->all();
 
-        return view('members.index', compact('members', 'wilayahField', 'wilayahOptions', 'yearOptions'));
+        $pendingRegistrationsCount = User::query()
+            ->pending()
+            ->count();
+
+        return view('members.index', compact('members', 'wilayahField', 'wilayahOptions', 'yearOptions', 'pendingRegistrationsCount'));
     }
 
     public function create()
