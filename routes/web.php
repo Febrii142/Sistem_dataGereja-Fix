@@ -6,6 +6,7 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\JemaatController;
 use App\Http\Controllers\JemaatDashboardController;
 use App\Http\Controllers\JemaatRegistrationController;
 use App\Http\Controllers\MemberController;
@@ -33,17 +34,6 @@ Route::middleware('auth')->group(function () {
         ->middleware('permission:view_dashboard')
         ->name('dashboard');
 
-    Route::resource('members', MemberController::class);
-    Route::post('/members/import', [MemberController::class, 'import'])
-        ->middleware('permission:import_members')
-        ->name('members.import');
-    Route::get('/members-export/excel', [MemberController::class, 'exportExcel'])
-        ->middleware('permission:export_members')
-        ->name('members.export.excel');
-    Route::get('/members-export/pdf', [MemberController::class, 'exportPdf'])
-        ->middleware('permission:export_members')
-        ->name('members.export.pdf');
-
     Route::get('/categories', [CategoryController::class, 'index'])
         ->middleware('permission:view_categories')
         ->name('categories.index');
@@ -59,10 +49,34 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('users', UserController::class)->except(['show']);
 
+    Route::prefix('members/verification')
+        ->name('members.verification.')
+        ->middleware('permission:view_users')
+        ->group(function () {
+            Route::get('/', [JemaatController::class, 'verificationQueue'])->name('index');
+            Route::post('/{user}/approve', [AdminApprovalController::class, 'approve'])
+                ->middleware('permission:edit_users')
+                ->name('approve');
+            Route::post('/{user}/reject', [AdminApprovalController::class, 'reject'])
+                ->middleware('permission:edit_users')
+                ->name('reject');
+        });
+
+    Route::resource('members', MemberController::class);
+    Route::post('/members/import', [MemberController::class, 'import'])
+        ->middleware('permission:import_members')
+        ->name('members.import');
+    Route::get('/members-export/excel', [MemberController::class, 'exportExcel'])
+        ->middleware('permission:export_members')
+        ->name('members.export.excel');
+    Route::get('/members-export/pdf', [MemberController::class, 'exportPdf'])
+        ->middleware('permission:export_members')
+        ->name('members.export.pdf');
+
     Route::prefix('admin/registrations')
         ->middleware('permission:view_users')
         ->group(function () {
-            Route::get('/pending', [AdminApprovalController::class, 'pending'])->name('admin.registrations.pending');
+            Route::get('/pending', fn () => redirect()->route('members.verification.index'))->name('admin.registrations.pending');
             Route::post('/{user}/approve', [AdminApprovalController::class, 'approve'])
                 ->middleware('permission:edit_users')
                 ->name('admin.registrations.approve');

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Jemaat;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class JemaatController extends Controller
 {
@@ -11,6 +13,7 @@ class JemaatController extends Controller
     {
         $this->middleware('permission:view_jemaat_dashboard')->only(['dashboard', 'showProfile']);
         $this->middleware('permission:edit_own_jemaat')->only(['editProfile', 'updateProfile']);
+        $this->middleware('permission:view_users')->only(['verificationQueue']);
     }
 
     public function dashboard()
@@ -61,6 +64,17 @@ class JemaatController extends Controller
         $jemaat->update($data);
 
         return redirect()->route('jemaat.profile.show')->with('success', 'Profil jemaat berhasil diperbarui.');
+    }
+
+    public function verificationQueue(): View
+    {
+        $pendingUsers = User::query()
+            ->pending()
+            ->with(['jemaat', 'member'])
+            ->latest()
+            ->paginate(20);
+
+        return view('members.verification', compact('pendingUsers'));
     }
 
     private function getOrCreateCurrentJemaat(): Jemaat
