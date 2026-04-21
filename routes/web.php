@@ -63,6 +63,9 @@ Route::middleware('auth')->group(function () {
         });
 
     Route::resource('members', MemberController::class);
+    Route::patch('/members/{member}/status', [MemberController::class, 'updateStatus'])
+        ->middleware('permission:edit_members')
+        ->name('members.update-status');
     Route::post('/members/import', [MemberController::class, 'import'])
         ->middleware('permission:import_members')
         ->name('members.import');

@@ -111,6 +111,17 @@
                     <div class="flex flex-wrap gap-2 md:justify-end">
                         <a class="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-100" href="{{ route('members.show', $member) }}">Lihat</a>
                         <a class="rounded-lg bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-100" href="{{ route('members.edit', $member) }}">Edit</a>
+                        @if(auth()->user()?->hasRole(['Admin', 'Super Admin', 'Staff']))
+                            <button
+                                type="button"
+                                class="open-status-modal rounded-lg bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-100"
+                                data-member-id="{{ $member->id }}"
+                                data-member-name="{{ $member->nama }}"
+                                data-member-status="{{ $member->status }}"
+                            >
+                                Ubah Status
+                            </button>
+                        @endif
                         <form action="{{ route('members.destroy', $member) }}" method="post" class="inline">
                             @csrf
                             @method('DELETE')
@@ -125,4 +136,71 @@
     @endforelse
 </div>
 <div class="mt-4">{{ $members->links() }}</div>
+
+@if(auth()->user()?->hasRole(['Admin', 'Super Admin', 'Staff']))
+    <div id="status-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/40 px-4">
+        <div class="w-full max-w-md rounded-xl bg-white p-5 shadow-xl">
+            <div class="mb-4 flex items-start justify-between gap-3">
+                <div>
+                    <h3 class="text-lg font-semibold text-slate-800">Ubah Status Jemaat</h3>
+                    <p id="status-modal-member-name" class="text-sm text-slate-500"></p>
+                </div>
+                <button type="button" id="close-status-modal" class="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600">✕</button>
+            </div>
+            <form id="status-modal-form" method="post" action="">
+                @csrf
+                @method('PATCH')
+                <label class="block text-sm">
+                    <span class="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">Status</span>
+                    <select id="status-modal-input" name="status" class="w-full rounded-lg border border-slate-200 px-3 py-2 focus:border-[#3b82f6] focus:outline-none" required>
+                        <option value="aktif">Aktif</option>
+                        <option value="tidak_aktif">Tidak Aktif</option>
+                        <option value="pindah">Pindah</option>
+                    </select>
+                </label>
+                <div class="mt-4 flex justify-end gap-2">
+                    <button type="button" id="cancel-status-modal" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Batal</button>
+                    <button type="submit" class="rounded-lg bg-[#3b82f6] px-4 py-2 text-sm font-semibold text-white hover:bg-[#2563eb]">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+@endif
 @endsection
+
+@push('scripts')
+@if(auth()->user()?->hasRole(['Admin', 'Super Admin', 'Staff']))
+<script>
+    const statusModal = document.getElementById('status-modal');
+    const statusModalForm = document.getElementById('status-modal-form');
+    const statusModalInput = document.getElementById('status-modal-input');
+    const statusModalMemberName = document.getElementById('status-modal-member-name');
+    const closeStatusModal = () => {
+        statusModal.classList.add('hidden');
+        statusModal.classList.remove('flex');
+    };
+
+    document.querySelectorAll('.open-status-modal').forEach((button) => {
+        button.addEventListener('click', function () {
+            const memberId = this.dataset.memberId;
+            const memberName = this.dataset.memberName;
+            const memberStatus = this.dataset.memberStatus;
+
+            statusModalForm.action = '{{ route('members.update-status', ['member' => '__MEMBER_ID__']) }}'.replace('__MEMBER_ID__', memberId);
+            statusModalInput.value = memberStatus;
+            statusModalMemberName.textContent = memberName;
+            statusModal.classList.remove('hidden');
+            statusModal.classList.add('flex');
+        });
+    });
+
+    document.getElementById('close-status-modal')?.addEventListener('click', closeStatusModal);
+    document.getElementById('cancel-status-modal')?.addEventListener('click', closeStatusModal);
+    statusModal?.addEventListener('click', function (event) {
+        if (event.target === statusModal) {
+            closeStatusModal();
+        }
+    });
+</script>
+@endif
+@endpush
