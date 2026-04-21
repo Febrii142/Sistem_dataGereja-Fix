@@ -118,6 +118,7 @@
                                 data-member-id="{{ $member->id }}"
                                 data-member-name="{{ $member->nama }}"
                                 data-member-status="{{ $member->status }}"
+                                data-update-url="{{ route('members.update-status', $member) }}"
                             >
                                 Ubah Status
                             </button>
@@ -182,11 +183,11 @@
 
     document.querySelectorAll('.open-status-modal').forEach((button) => {
         button.addEventListener('click', function () {
-            const memberId = this.dataset.memberId;
             const memberName = this.dataset.memberName;
             const memberStatus = this.dataset.memberStatus;
+            const updateUrl = this.dataset.updateUrl;
 
-            statusModalForm.action = '{{ route('members.update-status', ['member' => '__MEMBER_ID__']) }}'.replace('__MEMBER_ID__', memberId);
+            statusModalForm.action = updateUrl;
             statusModalInput.value = memberStatus;
             statusModalMemberName.textContent = memberName;
             statusModal.classList.remove('hidden');

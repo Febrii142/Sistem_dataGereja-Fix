@@ -10,6 +10,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Facades\Excel;
 
 class MemberController extends Controller
@@ -90,7 +91,7 @@ class MemberController extends Controller
             'nama' => ['required', 'string', 'max:255'],
             'alamat' => ['required', 'string'],
             'kontak' => ['required', 'string', 'max:30'],
-            'status' => ['required', 'in:aktif,tidak_aktif,pindah'],
+            'status' => ['required', Rule::in(Member::STATUSES)],
             'tanggal_lahir' => ['required', 'date'],
             'jenis_kelamin' => ['required', 'in:L,P'],
             'pekerjaan' => ['nullable', 'string', 'max:255'],
@@ -117,7 +118,7 @@ class MemberController extends Controller
             'nama' => ['required', 'string', 'max:255'],
             'alamat' => ['required', 'string'],
             'kontak' => ['required', 'string', 'max:30'],
-            'status' => ['required', 'in:aktif,tidak_aktif,pindah'],
+            'status' => ['required', Rule::in(Member::STATUSES)],
             'tanggal_lahir' => ['required', 'date'],
             'jenis_kelamin' => ['required', 'in:L,P'],
             'pekerjaan' => ['nullable', 'string', 'max:255'],
@@ -138,7 +139,7 @@ class MemberController extends Controller
     public function updateStatus(Request $request, Member $member)
     {
         $data = $request->validate([
-            'status' => ['required', 'in:aktif,tidak_aktif,pindah'],
+            'status' => ['required', Rule::in(Member::STATUSES)],
         ]);
 
         $member->update($data);

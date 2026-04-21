@@ -263,8 +263,9 @@
 
 @push('scripts')
 <script>
+    const reportTab = @json($activeTab ?? 'demografi');
     document.getElementById('reset-report-filters')?.addEventListener('click', function () {
-        window.location.href = '{{ route('reports.index', ['tab' => $activeTab ?? 'demografi']) }}';
+        window.location.href = '{{ route('reports.index') }}?tab=' + encodeURIComponent(reportTab);
     });
 </script>
 @endpush

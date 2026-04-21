@@ -10,6 +10,8 @@ use Illuminate\Support\Carbon;
 
 class ReportController extends Controller
 {
+    private const REPORT_PAGE_SIZE = 10;
+
     public function __construct()
     {
         $this->middleware('permission:view_reports')->only(['index']);
@@ -25,11 +27,11 @@ class ReportController extends Controller
 
         $members = (clone $membersQuery)
             ->orderBy('nama')
-            ->paginate(10)
+            ->paginate(self::REPORT_PAGE_SIZE)
             ->withQueryString();
         $statusMembers = (clone $statusMembersQuery)
             ->orderBy('nama')
-            ->paginate(10, ['*'], 'status_page')
+            ->paginate(self::REPORT_PAGE_SIZE, ['*'], 'status_page')
             ->withQueryString();
 
         $totalResults = (clone $membersQuery)->count();
@@ -50,15 +52,15 @@ class ReportController extends Controller
             : ($currentMonthCount > 0 ? 100.0 : 0.0);
 
         $distribution = (clone $membersQuery)
-            ->selectRaw('status as label, COUNT(*) as total')
+            ->selectRaw('status, COUNT(*) as total')
             ->groupBy('status')
             ->get()
             ->map(function ($item) use ($totalResults) {
-                $label = 'Sektor '.$this->statusLabel($item->label);
+                $formattedLabel = 'Status '.$this->statusLabel($item->status);
                 $percentage = $totalResults > 0 ? round(($item->total / $totalResults) * 100, 1) : 0;
 
                 return (object) [
-                    'label' => $label,
+                    'label' => $formattedLabel,
                     'total' => $item->total,
                     'percentage' => $percentage,
                 ];
@@ -69,7 +71,7 @@ class ReportController extends Controller
             ->groupBy('status')
             ->pluck('total', 'status');
         $statusGrandTotal = (int) $statusTotals->sum();
-        $statusSummary = collect(['aktif', 'tidak_aktif', 'pindah'])->map(function (string $status) use ($statusTotals, $statusGrandTotal) {
+        $statusSummary = collect(Member::STATUSES)->map(function (string $status) use ($statusTotals, $statusGrandTotal) {
             $total = (int) ($statusTotals[$status] ?? 0);
 
             return (object) [
@@ -127,7 +129,7 @@ class ReportController extends Controller
                 ->groupBy('status')
                 ->pluck('total', 'status');
             $statusGrandTotal = (int) $statusTotals->sum();
-            $statusSummary = collect(['aktif', 'tidak_aktif', 'pindah'])->map(function (string $status) use ($statusTotals, $statusGrandTotal) {
+            $statusSummary = collect(Member::STATUSES)->map(function (string $status) use ($statusTotals, $statusGrandTotal) {
                 $total = (int) ($statusTotals[$status] ?? 0);
 
                 return (object) [
@@ -160,11 +162,11 @@ class ReportController extends Controller
         $distribution = $members
             ->groupBy('status')
             ->map(function ($items, $status) use ($totalResults) {
-                $label = 'Sektor '.$this->statusLabel($status);
+                $formattedLabel = 'Status '.$this->statusLabel($status);
                 $count = $items->count();
 
                 return (object) [
-                    'label' => $label,
+                    'label' => $formattedLabel,
                     'total' => $count,
                     'percentage' => $totalResults > 0 ? round(($count / $totalResults) * 100, 1) : 0,
                 ];
