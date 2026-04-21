@@ -12,6 +12,7 @@
     </select>
     <input class="rounded border px-3 py-2" name="password" type="password" placeholder="Password" required>
     <input class="rounded border px-3 py-2" name="password_confirmation" type="password" placeholder="Konfirmasi Password" required>
-    <button class="rounded bg-slate-900 px-4 py-2 text-white">Simpan</button>
+    <button class="rounded bg-slate-900 px-4 py-2 text-white">Simpan &amp; Undang User</button>
 </form>
+<p class="mt-3 text-xs text-slate-500">Role dibatasi untuk Admin dan Staff agar User Management tetap fokus pada staf operasional.</p>
 @endsection
