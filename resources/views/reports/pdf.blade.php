@@ -17,7 +17,7 @@
 </head>
 <body>
     <h2>ANALISIS DEMOGRAFI JEMAAT</h2>
-    <p class="muted">Filter: Rentang Usia {{ $filters['age_range'] ?: 'Semua' }}, Gender {{ $filters['gender'] ?: 'Semua' }}, Bulan Ulang Tahun {{ $filters['birthday_month'] ?: 'Semua' }}</p>
+    <p class="muted">Filter: Rentang Usia {{ $filterLabels['age_range'] }}, Gender {{ $filterLabels['gender'] }}, Bulan Ulang Tahun {{ $filterLabels['birthday_month'] }}</p>
 
     <div class="card">
         <strong>Total Hasil Filter:</strong> {{ number_format($totalResults) }} jemaat

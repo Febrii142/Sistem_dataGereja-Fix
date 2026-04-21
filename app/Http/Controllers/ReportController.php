@@ -90,6 +90,7 @@ class ReportController extends Controller
     public function exportPdf(Request $request)
     {
         $filters = $this->getFilterState($request);
+        $filterLabels = $this->mapFilterLabels($filters);
         $membersQuery = $this->buildFilteredMembersQuery($filters);
 
         $members = (clone $membersQuery)
@@ -115,6 +116,7 @@ class ReportController extends Controller
         $pdf = Pdf::loadView('reports.pdf', [
             'members' => $members,
             'filters' => $filters,
+            'filterLabels' => $filterLabels,
             'totalResults' => $totalResults,
             'distribution' => $distribution,
         ]);
@@ -170,5 +172,29 @@ class ReportController extends Controller
         });
 
         return $query;
+    }
+
+    private function mapFilterLabels(array $filters): array
+    {
+        $monthLabel = 'Semua';
+        if ($filters['birthday_month'] !== '') {
+            $monthLabel = Carbon::create()->month((int) $filters['birthday_month'])->translatedFormat('F');
+        }
+
+        return [
+            'age_range' => [
+                '' => 'Semua',
+                'anak' => 'Anak (3-12)',
+                'remaja' => 'Remaja (13-18)',
+                'dewasa' => 'Dewasa (19-59)',
+                'lansia' => 'Lansia (60+)',
+            ][$filters['age_range']] ?? 'Semua',
+            'gender' => [
+                '' => 'Semua',
+                'L' => 'Laki-laki',
+                'P' => 'Perempuan',
+            ][$filters['gender']] ?? 'Semua',
+            'birthday_month' => $monthLabel,
+        ];
     }
 }
