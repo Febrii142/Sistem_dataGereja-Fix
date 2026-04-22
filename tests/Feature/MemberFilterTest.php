@@ -186,6 +186,26 @@ class MemberFilterTest extends TestCase
         });
     }
 
+    public function test_members_index_header_shows_export_actions_without_add_button(): void
+    {
+        $this->seed([
+            PermissionSeeder::class,
+            RoleSeeder::class,
+        ]);
+
+        $user = User::factory()->create([
+            'role_id' => Role::query()->where('name', 'Staff')->value('id'),
+            'role' => 'koordinator',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('members.index'));
+
+        $response->assertOk();
+        $response->assertSee(route('members.export.excel'), false);
+        $response->assertSee(route('members.export.pdf'), false);
+        $response->assertDontSee('Tambah Data Baru');
+    }
+
     public function test_staff_can_update_member_status_to_pindah(): void
     {
         $this->seed([
