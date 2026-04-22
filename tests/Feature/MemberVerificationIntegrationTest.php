@@ -47,6 +47,9 @@ class MemberVerificationIntegrationTest extends TestCase
         $response->assertOk();
         $response->assertSee('Verifikasi Jemaat Baru');
         $response->assertSee('Ada 2 pendaftaran baru');
+        $response->assertSee('Cari nama, email, atau kontak...');
+        $response->assertSee('Menampilkan 1 jemaat');
+        $response->assertDontSee('Tambah Data Baru');
         $response->assertDontSee(route('members.export.pdf'));
         $response->assertDontSee(route('members.export.excel'));
     }
