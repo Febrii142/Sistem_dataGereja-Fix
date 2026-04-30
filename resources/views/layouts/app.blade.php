@@ -75,7 +75,9 @@
             <div class="mb-7 flex items-center gap-3 px-2">
                 <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 shadow-inner">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3L2 9l10 6 10-6-10-6zM2 17l10 6 10-6M2 13l10 6 10-6" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3L2 9l10 6 10-6-10-6z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2 17l10 6 10-6" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2 13l10 6 10-6" />
                     </svg>
                 </div>
                 <div>
@@ -106,7 +108,7 @@
                     <a href="{{ route('jemaat.keluarga.index') }}"
                        class="nav-link {{ request()->routeIs('jemaat.keluarga*') ? 'active' : '' }}">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 7a4 4 0 014-4h10a4 4 0 014 4v1H3V7zm0 4h18v7a4 4 0 01-4 4H7a4 4 0 01-4-4v-7z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
                         <span>Keanggotaan</span>
                     </a>
