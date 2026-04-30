@@ -10,58 +10,61 @@
         <script src="https://cdn.tailwindcss.com"></script>
     @endif
     <style>
-        .sidebar-gradient {
-            background: linear-gradient(180deg, #4b7ec9 0%, #5a8dd8 60%, #6b98e0 100%);
+        .sidebar-surface {
+            background: #f1f5f9;
+            border-right: 1px solid #e2e8f0;
         }
         .nav-link {
             display: flex;
             align-items: center;
             gap: 0.5rem;
             padding: 0.5rem 0.75rem;
-            border-radius: 0.4rem;
+            border-radius: 0.75rem;
             font-size: 0.8125rem;
             font-weight: 500;
-            color: rgba(255,255,255,0.85);
+            color: #475569;
             transition: all 0.15s ease;
-            border-left: 2.5px solid transparent;
         }
         .nav-link:hover {
-            background: rgba(255,255,255,0.12);
-            color: #ffffff;
+            background: #e2e8f0;
+            color: #0f172a;
+            transform: translateX(2px);
         }
         .nav-link.active {
-            background: rgba(255,255,255,0.18);
-            color: #ffffff;
-            border-left-color: #ffffff;
+            background: #dbeafe;
+            color: #1e40af;
             font-weight: 600;
         }
         .nav-link svg {
             flex-shrink: 0;
-            opacity: 0.9;
+            color: #64748b;
+        }
+        .nav-link.active svg {
+            color: #1d4ed8;
         }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-900">
+<body class="bg-slate-50 text-slate-900">
 @auth
     @php($user = auth()->user())
     <div class="min-h-screen lg:grid lg:grid-cols-[210px_1fr]">
-        <aside class="sidebar-gradient flex flex-col px-2.5 py-3 text-white">
+        <aside class="sidebar-surface flex flex-col px-2.5 py-3 text-slate-700">
             {{-- Brand / Logo --}}
             <div class="mb-3 flex items-center gap-2 px-1">
-                <div class="flex h-8 w-8 items-center justify-center rounded-md bg-white/20">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <div class="flex h-8 w-8 items-center justify-center rounded-md bg-blue-600/10 text-blue-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 3L2 9l10 6 10-6-10-6z" />
                         <path stroke-linecap="round" stroke-linejoin="round" d="M2 17l10 6 10-6" />
                     </svg>
                 </div>
                 <div class="min-w-0">
-                    <h1 class="text-sm font-bold leading-tight text-white truncate">SIM</h1>
-                    <p class="text-[10px] text-white/65 leading-none">Gereja</p>
+                    <h1 class="text-sm font-bold leading-tight text-slate-900 truncate">SIM Jemaat</h1>
+                    <p class="text-[10px] text-slate-500 leading-none">Stewardship</p>
                 </div>
             </div>
 
             {{-- Divider --}}
-            <div class="mb-2.5 border-t border-white/10"></div>
+            <div class="mb-2.5 border-t border-slate-200"></div>
 
             <nav class="flex flex-col gap-0.5 flex-1 overflow-y-auto">
                 @if($user->hasRole(['Jemaat Gereja', 'jemaat']))
@@ -147,10 +150,10 @@
             </nav>
 
             {{-- Logout --}}
-            <div class="border-t border-white/10 pt-2.5">
+            <div class="border-t border-slate-200 pt-2.5">
                 <form action="{{ route('logout') }}" method="post">
                     @csrf
-                    <button class="flex w-full items-center justify-center gap-1.5 rounded-md bg-white/15 px-2 py-1.5 text-xs font-medium text-white transition hover:bg-white/25">
+                    <button class="flex w-full items-center justify-center gap-1.5 rounded-md bg-slate-200 px-2 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-300">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                         </svg>
