@@ -9,80 +9,245 @@
     @else
         <script src="https://cdn.tailwindcss.com"></script>
     @endif
+    <style>
+        .sidebar-gradient {
+            background: linear-gradient(180deg, #1e3a6e 0%, #2c5aa0 60%, #3b68b0 100%);
+        }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            padding: 0.6rem 0.875rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: rgba(255,255,255,0.82);
+            transition: background 0.18s, color 0.18s, border-color 0.18s;
+            border-left: 3px solid transparent;
+        }
+        .nav-link:hover {
+            background: rgba(255,255,255,0.10);
+            color: #ffffff;
+            border-left-color: rgba(255,255,255,0.4);
+        }
+        .nav-link.active {
+            background: rgba(59,130,246,0.22);
+            color: #ffffff;
+            border-left-color: #60a5fa;
+            font-weight: 600;
+        }
+        .nav-link svg {
+            flex-shrink: 0;
+            opacity: 0.85;
+        }
+        .nav-link.active svg {
+            opacity: 1;
+        }
+        .nav-sub-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.875rem 0.5rem 2.5rem;
+            border-radius: 0.5rem;
+            font-size: 0.8125rem;
+            color: rgba(255,255,255,0.72);
+            transition: background 0.18s, color 0.18s, border-color 0.18s;
+            border-left: 3px solid transparent;
+        }
+        .nav-sub-link:hover {
+            background: rgba(255,255,255,0.08);
+            color: #ffffff;
+            border-left-color: rgba(255,255,255,0.3);
+        }
+        .nav-sub-link.active {
+            background: rgba(59,130,246,0.18);
+            color: #ffffff;
+            border-left-color: #60a5fa;
+        }
+    </style>
 </head>
 <body class="bg-slate-100 text-slate-900">
 @auth
     @php($user = auth()->user())
     <div class="min-h-screen lg:grid lg:grid-cols-[260px_1fr]">
-        <aside class="flex flex-col bg-[#1e40af] p-4 text-white">
-            <h1 class="mb-6 text-xl font-bold">SIM Jemaat</h1>
-            <nav class="space-y-2 text-sm">
+        <aside class="sidebar-gradient flex flex-col px-3 py-5 text-white shadow-xl">
+            {{-- Brand / Logo --}}
+            <div class="mb-7 flex items-center gap-3 px-2">
+                <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-white/15 shadow-inner">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3L2 9l10 6 10-6-10-6zM2 17l10 6 10-6M2 13l10 6 10-6" />
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-base font-bold leading-tight tracking-wide text-white">SIM Jemaat</h1>
+                    <p class="text-[11px] text-white/55 leading-none mt-0.5">Sistem Informasi Gereja</p>
+                </div>
+            </div>
+
+            {{-- Divider --}}
+            <div class="mb-4 border-t border-white/10"></div>
+
+            <nav class="flex flex-col gap-0.5 text-sm">
                 @if($user->hasRole(['Jemaat Gereja', 'jemaat']))
-                    <a href="{{ route('jemaat.dashboard') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('jemaat.dashboard') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Dashboard</a>
-                    <a href="{{ route('jemaat.profile') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('jemaat.profile*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Jemaat</a>
-                    <a href="{{ route('jemaat.keluarga.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('jemaat.keluarga*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Keanggotan</a>
+                    <a href="{{ route('jemaat.dashboard') }}"
+                       class="nav-link {{ request()->routeIs('jemaat.dashboard') ? 'active' : '' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4" />
+                        </svg>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="{{ route('jemaat.profile') }}"
+                       class="nav-link {{ request()->routeIs('jemaat.profile*') ? 'active' : '' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <span>Jemaat</span>
+                    </a>
+                    <a href="{{ route('jemaat.keluarga.index') }}"
+                       class="nav-link {{ request()->routeIs('jemaat.keluarga*') ? 'active' : '' }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 7a4 4 0 014-4h10a4 4 0 014 4v1H3V7zm0 4h18v7a4 4 0 01-4 4H7a4 4 0 01-4-4v-7z" />
+                        </svg>
+                        <span>Keanggotaan</span>
+                    </a>
                     @if($user->status === 'approved')
-                        <a href="{{ route('jemaat.profile.edit') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('jemaat.profile.edit') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Settings</a>
+                        <a href="{{ route('jemaat.profile.edit') }}"
+                           class="nav-link {{ request()->routeIs('jemaat.profile.edit') ? 'active' : '' }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <span>Settings</span>
+                        </a>
                     @endif
                 @else
                     @if($user->hasPermission('view_dashboard'))
-                        <a href="{{ route('dashboard') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('dashboard') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Dashboard</a>
+                        <a href="{{ route('dashboard') }}"
+                           class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0h4" />
+                            </svg>
+                            <span>Dashboard</span>
+                        </a>
                     @endif
                     @if($user->hasPermission('view_members'))
-                        <a href="{{ route('members.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('members.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Jemaat</a>
+                        <a href="{{ route('members.index') }}"
+                           class="nav-link {{ request()->routeIs('members.*') && !request()->routeIs('members.verification.*') ? 'active' : '' }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <span>Jemaat</span>
+                        </a>
                     @endif
                     @if($user->hasPermission('view_users'))
-                        <a href="{{ route('members.verification.index') }}" class="ml-3 block rounded-lg px-3 py-2 {{ request()->routeIs('members.verification.*', 'admin.registrations.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">↳ Verifikasi Jemaat Baru</a>
+                        <a href="{{ route('members.verification.index') }}"
+                           class="nav-sub-link {{ request()->routeIs('members.verification.*', 'admin.registrations.*') ? 'active' : '' }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>Verifikasi Jemaat Baru</span>
+                        </a>
                     @endif
                     @if($user->hasPermission('view_categories'))
-                        <a href="{{ route('categories.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('categories.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Kategori</a>
+                        <a href="{{ route('categories.index') }}"
+                           class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                            </svg>
+                            <span>Kategori</span>
+                        </a>
                     @endif
                     @if($user->hasPermission('view_users'))
-                        <a href="{{ route('users.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('users.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">User Management</a>
+                        <a href="{{ route('users.index') }}"
+                           class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                            <span>User Management</span>
+                        </a>
                     @endif
                     @if($user->hasPermission('view_reports'))
-                        <a href="{{ route('reports.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('reports.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Laporan</a>
+                        <a href="{{ route('reports.index') }}"
+                           class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <span>Laporan</span>
+                        </a>
                     @endif
                     @if($user->hasPermission('view_settings'))
-                        <a href="{{ route('settings.index') }}" class="block rounded-lg px-3 py-2 {{ request()->routeIs('settings.*') ? 'bg-[#3b82f6]' : 'hover:bg-[#3b82f6]' }}">Settings</a>
+                        <a href="{{ route('settings.index') }}"
+                           class="nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            <span>Settings</span>
+                        </a>
                     @endif
                 @endif
             </nav>
-            <form action="{{ route('logout') }}" method="post" class="mt-auto pt-6">
-                @csrf
-                <button class="w-full rounded-lg bg-rose-500 px-3 py-2 text-sm font-semibold hover:bg-rose-600">Logout</button>
-            </form>
+
+            {{-- Logout --}}
+            <div class="mt-auto pt-5 border-t border-white/10">
+                <div class="mb-3 flex items-center gap-2.5 px-2">
+                    <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-white/15 text-xs font-bold uppercase text-white shadow-inner">
+                        {{ substr($user->name, 0, 1) }}
+                    </div>
+                    <div class="min-w-0">
+                        <p class="truncate text-sm font-semibold text-white">{{ $user->name }}</p>
+                        <p class="text-[11px] text-white/55">{{ $user->role_name ? ucfirst($user->role_name) : '—' }}</p>
+                    </div>
+                </div>
+                <form action="{{ route('logout') }}" method="post">
+                    @csrf
+                    <button class="flex w-full items-center justify-center gap-2 rounded-lg bg-white/10 px-3 py-2 text-sm font-semibold text-white/90 transition hover:bg-rose-500 hover:text-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        Logout
+                    </button>
+                </form>
+            </div>
         </aside>
         <main class="flex min-h-screen flex-col">
-            <header class="border-b border-slate-200 bg-white px-4 py-3 lg:px-8">
+            <header class="border-b border-slate-200 bg-white px-4 py-3 shadow-sm lg:px-8">
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <form class="w-full max-w-lg" method="get" action="{{ $user->hasPermission('view_members') ? route('members.index') : ($user->hasPermission('view_jemaat_dashboard') ? route('jemaat.dashboard') : route('dashboard')) }}">
-                        <label>
+                        <label class="relative block">
                             <span class="sr-only">Search</span>
-                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari data jemaat..." class="w-full rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm focus:border-[#3b82f6] focus:outline-none">
+                            <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-slate-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z" />
+                                </svg>
+                            </span>
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari data jemaat..." class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pl-9 pr-4 text-sm focus:border-[#3b82f6] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#3b82f6]">
                         </label>
                     </form>
                     <div class="ml-auto flex items-center gap-3">
-                        <a href="{{ route('notifications.index') }}" class="rounded-full bg-slate-100 p-2 text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6]" aria-label="Notifikasi">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                <path d="M10 2a4 4 0 00-4 4v1.38a3 3 0 01-.88 2.12L4.7 9.92A1 1 0 005.4 11.6H14.6a1 1 0 00.7-1.7l-.42-.42A3 3 0 0114 7.38V6a4 4 0 00-4-4z" />
-                                <path d="M7.5 13a2.5 2.5 0 005 0h-5z" />
+                        <a href="{{ route('notifications.index') }}" class="relative rounded-full bg-slate-100 p-2 text-slate-500 transition hover:bg-slate-200 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6]" aria-label="Notifikasi">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 00-9.33-4.993M15 17H9m6 0a3 3 0 01-6 0m-2.67-1.405A2.032 2.032 0 016 14.158V11a6 6 0 016-6" />
                             </svg>
                         </a>
-                        <div class="rounded-lg bg-slate-100 px-3 py-2 text-sm">
-                            <p class="font-semibold">{{ $user->name }}</p>
-                            <p class="text-xs text-slate-500">{{ $user->role_name ? ucfirst($user->role_name) : '-' }}</p>
-                        </div>
                     </div>
                 </div>
             </header>
             <section class="flex-1 p-4 lg:p-8">
                 @if(session('success'))
-                    <div class="mb-4 rounded border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-700">{{ session('success') }}</div>
+                    <div class="mb-4 flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-800 shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span class="text-sm">{{ session('success') }}</span>
+                    </div>
                 @endif
                 @if($errors->any())
-                    <div class="mb-4 rounded border border-rose-200 bg-rose-50 px-4 py-3 text-rose-700">
-                        <ul class="list-inside list-disc">
+                    <div class="mb-4 flex items-start gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-rose-800 shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 h-4 w-4 flex-shrink-0 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <ul class="list-inside list-disc text-sm">
                             @foreach($errors->all() as $error)
                                 <li>{{ $error }}</li>
                             @endforeach
@@ -96,11 +261,19 @@
 @else
     <main class="min-h-screen p-4 lg:p-8">
         @if(session('success'))
-            <div class="mb-4 rounded border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-700">{{ session('success') }}</div>
+            <div class="mb-4 flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-emerald-800 shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span class="text-sm">{{ session('success') }}</span>
+            </div>
         @endif
         @if($errors->any())
-            <div class="mb-4 rounded border border-rose-200 bg-rose-50 px-4 py-3 text-rose-700">
-                <ul class="list-inside list-disc">
+            <div class="mb-4 flex items-start gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-rose-800 shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 h-4 w-4 flex-shrink-0 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <ul class="list-inside list-disc text-sm">
                     @foreach($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
