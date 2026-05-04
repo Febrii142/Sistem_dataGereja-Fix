@@ -51,14 +51,9 @@
         <aside class="sidebar-surface flex flex-col px-2.5 py-3 text-slate-700">
             {{-- Brand / Logo --}}
             <div class="mb-3 flex items-center gap-2 px-1">
-                <div class="flex h-8 w-8 items-center justify-center rounded-md bg-blue-600/10 text-blue-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3L2 9l10 6 10-6-10-6z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M2 17l10 6 10-6" />
-                    </svg>
-                </div>
+                <img src="{{ asset('logo.png') }}" alt="Logo GSJA Maranatha" class="h-8 w-8 rounded-full object-cover" />
                 <div class="min-w-0">
-                    <h1 class="text-sm font-bold leading-tight text-slate-900 truncate">SIM Jemaat</h1>
+                    <h1 class="text-sm font-bold leading-tight text-slate-900 truncate">GSJA MARANATHA</h1>
                     <p class="text-[10px] text-slate-500 leading-none">Stewardship</p>
                 </div>
             </div>
@@ -93,7 +88,7 @@
                         <a href="{{ route('jemaat.profile.edit') }}"
                            class="nav-link {{ request()->routeIs('jemaat.profile.edit') ? 'active' : '' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.370-2.37.996.608 2.296.07 2.572-1.065z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.350 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.370 2.370a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.350a1.724 1.724 0 00-1.066 2.573c.940 1.543-.826 3.310-2.370 2.370a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.350 0a1.724 1.724 0 00-2.573-1.066c-1.543.940-3.310-.826-2.370-2.370a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.350a1.724 1.724 0 001.066-2.573c-.940-1.543.826-3.310 2.370-2.370.996.608 2.296.070 2.572-1.065z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
                             <span>Pengaturan</span>
@@ -140,7 +135,7 @@
                         <a href="{{ route('settings.index') }}"
                            class="nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.350 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.370 2.370a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.350a1.724 1.724 0 00-1.066 2.573c.940 1.543-.826 3.310-2.370 2.370a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.350 0a1.724 1.724 0 00-2.573-1.066c-1.543.940-3.310-.826-2.370-2.370a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.350a1.724 1.724 0 001.066-2.573c-.940-1.543.826-3.310 2.370-2.370.996.608 2.296.070 2.572-1.065z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
                             <span>Pengaturan</span>
