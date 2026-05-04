@@ -116,6 +116,9 @@
                     'pindah' => 'bg-amber-100 text-amber-700',
                     default => 'bg-indigo-100 text-indigo-700',
                 };
+                $genderClass = $member->jenis_kelamin === 'P'
+                    ? 'bg-rose-100 text-rose-700'
+                    : 'bg-cyan-100 text-cyan-700';
                 $initials = \Illuminate\Support\Str::of($member->nama)
                     ->explode(' ')
                     ->filter()
@@ -136,7 +139,7 @@
                             <p class="text-sm text-slate-500">{{ $member->alamat }}</p>
                             <div class="flex flex-wrap gap-1">
                                 <span class="rounded-full bg-indigo-100 px-2 py-1 text-xs font-semibold text-indigo-700">{{ $kategoriUmur }}</span>
-                                <span class="rounded-full bg-cyan-100 px-2 py-1 text-xs font-semibold text-cyan-700">{{ $member->jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan' }}</span>
+                                <span class="rounded-full px-2 py-1 text-xs font-semibold {{ $genderClass }}">{{ $member->jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan' }}</span>
                                 @if(! empty($wilayahField) && ! empty($member->{$wilayahField}))
                                     <span class="rounded-full bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-700">{{ $member->{$wilayahField} }}</span>
                                 @endif
