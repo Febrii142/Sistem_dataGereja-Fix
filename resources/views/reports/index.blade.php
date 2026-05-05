@@ -39,29 +39,23 @@
     <div class="rounded-2xl bg-white p-5 shadow-sm lg:p-6">
         <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Laporan Jemaat</p>
-                <h2 class="mt-1 text-2xl font-bold text-slate-800">ANALISIS DEMOGRAFI</h2>
-                <p class="mt-1 text-sm text-slate-500">Ringkasan data jemaat berdasarkan filter usia, gender, dan bulan ulang tahun.</p>
+                <p class="text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">Pusat Analitik & Wawasan</p>
+                <h2 class="mt-1 text-3xl font-bold text-slate-800">Laporan Jemaat</h2>
+                <p class="mt-1 text-sm text-slate-500">Akses visualisasi dan rekap data untuk mendukung pengambilan keputusan pelayanan jemaat.</p>
             </div>
             <div class="flex flex-wrap items-center gap-2">
-                <a href="{{ route('notifications.index') }}" class="rounded-full bg-slate-100 p-2 text-slate-600" aria-label="Notifikasi">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a4 4 0 00-4 4v1.38a3 3 0 01-.88 2.12L4.7 9.92A1 1 0 005.4 11.6H14.6a1 1 0 00.7-1.7l-.42-.42A3 3 0 0114 7.38V6a4 4 0 00-4-4z" /><path d="M7.5 13a2.5 2.5 0 005 0h-5z" /></svg>
-                </a>
-                <a href="{{ route('settings.index') }}" class="rounded-full bg-slate-100 p-2 text-slate-600" aria-label="Pengaturan">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17a1 1 0 00-1.98 0l-.1.74a1 1 0 01-.78.85l-.72.16a1 1 0 00-.66 1.5l.4.63a1 1 0 010 .99l-.4.64a1 1 0 00.66 1.49l.72.16a1 1 0 01.79.85l.09.74a1 1 0 001.98 0l.1-.74a1 1 0 01.78-.85l.72-.16a1 1 0 00.66-1.5l-.4-.63a1 1 0 010-.99l.4-.64a1 1 0 00-.66-1.49l-.72-.16a1 1 0 01-.79-.85l-.09-.74zM10.5 12a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
-                </a>
-                <a href="{{ route('reports.export.pdf', $pdfQuery) }}" class="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700">Cetak PDF</a>
-                <a href="{{ route('members.export.excel', $excelQuery) }}" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">Export Excel</a>
+                <a href="{{ route('reports.export.pdf', $pdfQuery) }}" class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Cetak PDF</a>
+                <a href="{{ route('members.export.excel', $excelQuery) }}" class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800">Export Excel</a>
             </div>
         </div>
     </div>
 
     <div class="rounded-2xl bg-white p-2 shadow-sm">
         <div class="grid grid-cols-1 gap-2 md:grid-cols-2">
-            <a href="{{ route('reports.index', ['tab' => 'demografi']) }}" class="rounded-xl px-4 py-2 text-center text-sm font-semibold {{ ($activeTab ?? 'demografi') === 'demografi' ? 'bg-[#1e40af] text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
+            <a href="{{ route('reports.index', ['tab' => 'demografi']) }}" class="rounded-xl px-4 py-2 text-center text-sm font-semibold {{ ($activeTab ?? 'demografi') === 'demografi' ? 'bg-[#1e40af] text-white' : 'text-slate-600 hover:bg-slate-50' }}">
                 Analisis Demografi
             </a>
-            <a href="{{ route('reports.index', ['tab' => 'status']) }}" class="rounded-xl px-4 py-2 text-center text-sm font-semibold {{ ($activeTab ?? 'demografi') === 'status' ? 'bg-[#1e40af] text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200' }}">
+            <a href="{{ route('reports.index', ['tab' => 'status']) }}" class="rounded-xl px-4 py-2 text-center text-sm font-semibold {{ ($activeTab ?? 'demografi') === 'status' ? 'bg-[#1e40af] text-white' : 'text-slate-600 hover:bg-slate-50' }}">
                 Status Jemaat
             </a>
         </div>
@@ -70,7 +64,16 @@
     @if(($activeTab ?? 'demografi') === 'demografi')
         <form method="GET" action="{{ route('reports.index') }}" class="rounded-2xl bg-white p-5 shadow-sm lg:p-6">
             <input type="hidden" name="tab" value="demografi">
-            <p class="text-sm font-semibold text-slate-700">Parameter Filter</p>
+            <div class="flex flex-wrap items-start justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 text-slate-600">📊</div>
+                    <div>
+                        <p class="text-base font-semibold text-slate-800">Filter Analitik Lanjutan</p>
+                        <p class="text-xs text-slate-500">Atur parameter usia, jenis kelamin, dan bulan ulang tahun.</p>
+                    </div>
+                </div>
+                <button type="button" id="reset-report-filters" class="text-sm font-semibold text-slate-600 hover:text-slate-800">Reset Filter</button>
+            </div>
             <div class="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 <label class="block text-sm">
                     <span class="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">Rentang Usia</span>
@@ -97,9 +100,8 @@
                     </select>
                 </label>
             </div>
-            <div class="mt-4 flex flex-wrap justify-end gap-2">
-                <button type="button" id="reset-report-filters" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Reset Filter</button>
-                <button type="submit" class="rounded-lg bg-[#3b82f6] px-4 py-2 text-sm font-semibold text-white hover:bg-[#2563eb]">Terapkan Filter</button>
+            <div class="mt-5 flex justify-center">
+                <button type="submit" class="rounded-lg bg-[#1e40af] px-6 py-3 text-sm font-semibold text-white hover:bg-[#1d4ed8]">Terapkan Filter &amp; Muat Data</button>
             </div>
         </form>
 
@@ -134,7 +136,10 @@
 
         <div class="rounded-2xl bg-white p-5 shadow-sm lg:p-6">
             <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <h3 class="text-sm font-semibold text-slate-700">Direktori Hasil</h3>
+                <div>
+                    <h3 class="text-sm font-semibold text-slate-700">Direktori Hasil</h3>
+                    <p class="text-xs text-slate-500">Daftar jemaat sesuai filter yang dipilih.</p>
+                </div>
                 <form method="GET" action="{{ route('reports.index') }}" class="w-full sm:max-w-sm">
                     <input type="hidden" name="tab" value="demografi">
                     <input type="hidden" name="age_range" value="{{ $filters['age_range'] ?? '' }}">
@@ -158,7 +163,7 @@
                     <tbody>
                         @forelse($members as $member)
                             @php
-                                $age = $member->tanggal_lahir ? \Illuminate\Support\Carbon::parse($member->tanggal_lahir)->age : '-';
+                                $age = $member->tanggal_lahir ? \\Illuminate\\Support\\Carbon::parse($member->tanggal_lahir)->age : '-';
                                 $initials = collect(explode(' ', trim($member->nama)))->filter()->map(fn ($part) => mb_substr($part, 0, 1))->take(2)->implode('');
                             @endphp
                             <tr class="border-b border-slate-100 hover:bg-slate-50">
@@ -170,7 +175,7 @@
                                 </td>
                                 <td class="px-3 py-3 text-slate-600">{{ $age }}</td>
                                 <td class="px-3 py-3 text-slate-600">{{ $member->jenis_kelamin }}</td>
-                                <td class="px-3 py-3 text-slate-600">{{ $member->tanggal_lahir ? \Illuminate\Support\Carbon::parse($member->tanggal_lahir)->format('d M Y') : '-' }}</td>
+                                <td class="px-3 py-3 text-slate-600">{{ $member->tanggal_lahir ? \\Illuminate\\Support\\Carbon::parse($member->tanggal_lahir)->format('d M Y') : '-' }}</td>
                                 <td class="px-3 py-3">
                                     <a href="{{ route('members.index', ['search' => $member->nama]) }}" class="text-xs font-semibold text-[#2563eb] hover:underline">Lihat Detail</a>
                                 </td>
@@ -191,7 +196,13 @@
     @else
         <form method="GET" action="{{ route('reports.index') }}" class="rounded-2xl bg-white p-5 shadow-sm lg:p-6">
             <input type="hidden" name="tab" value="status">
-            <p class="text-sm font-semibold text-slate-700">Filter Status Jemaat</p>
+            <div class="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                    <p class="text-base font-semibold text-slate-800">Filter Status Jemaat</p>
+                    <p class="text-xs text-slate-500">Gunakan filter status dan pencarian untuk rekap cepat.</p>
+                </div>
+                <button type="button" id="reset-report-filters" class="text-sm font-semibold text-slate-600 hover:text-slate-800">Reset Filter</button>
+            </div>
             <div class="mt-4 grid gap-4 md:grid-cols-2">
                 <label class="block text-sm">
                     <span class="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-500">Status</span>
@@ -207,9 +218,8 @@
                     <input type="text" name="search" value="{{ $filters['search'] ?? '' }}" placeholder="Nama/kontak/alamat..." class="w-full rounded-lg border border-slate-200 px-3 py-2 focus:border-[#3b82f6] focus:outline-none">
                 </label>
             </div>
-            <div class="mt-4 flex flex-wrap justify-end gap-2">
-                <button type="button" id="reset-report-filters" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Reset Filter</button>
-                <button type="submit" class="rounded-lg bg-[#3b82f6] px-4 py-2 text-sm font-semibold text-white hover:bg-[#2563eb]">Terapkan Filter</button>
+            <div class="mt-5 flex justify-center">
+                <button type="submit" class="rounded-lg bg-[#1e40af] px-6 py-3 text-sm font-semibold text-white hover:bg-[#1d4ed8]">Terapkan Filter &amp; Muat Data</button>
             </div>
         </form>
 

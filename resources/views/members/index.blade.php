@@ -1,185 +1,141 @@
 @extends('layouts.app')
 @section('content')
-<div class="space-y-5">
+<div class="space-y-6">
     <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <div class="flex flex-wrap items-start justify-between gap-4">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
-                <h2 class="text-2xl font-bold text-slate-900">Data Jemaat</h2>
-                <p class="mt-1 text-sm text-slate-500">Kelola informasi jemaat dengan tampilan yang lebih modern dan terstruktur.</p>
+                <h2 class="text-2xl font-bold text-slate-900">Daftar Jemaat</h2>
+                <p class="mt-1 text-sm text-slate-500">Fokus pada CRUD jemaat dan pencarian dasar.</p>
             </div>
-            <div class="ml-auto flex w-full flex-col gap-3 md:w-auto md:min-w-[24rem]">
-                <form method="get" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 p-2">
-                    @foreach(['status', 'age_category', 'gender', 'year', 'wilayah'] as $filterKey)
-                        @if(request()->filled($filterKey))
-                            <input type="hidden" name="{{ $filterKey }}" value="{{ request($filterKey) }}">
-                        @endif
-                    @endforeach
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <form method="get" class="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-2">
+                    <span class="text-slate-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z" />
+                        </svg>
+                    </span>
                     <input
-                        class="w-full bg-transparent px-2 py-1 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none"
+                        class="w-full bg-transparent px-2 text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none"
                         name="search"
                         value="{{ request('search') }}"
-                        placeholder="Cari nama, email, atau kontak..."
+                        placeholder="Cari nama atau alamat..."
                     >
-                    <button class="rounded-lg bg-[#3b82f6] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#2563eb]">Cari</button>
+                    <button class="rounded-full bg-[#3b82f6] px-4 py-1.5 text-xs font-semibold text-white hover:bg-[#2563eb]">Cari</button>
                 </form>
-                @if(auth()->user()?->hasPermission('export_members'))
-                    <div class="flex flex-wrap justify-end gap-2">
-                        <a href="{{ route('members.export.excel', request()->only(['search', 'status', 'age_category', 'gender', 'year', 'wilayah'])) }}" class="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-700">Export Excel</a>
-                        <a href="{{ route('members.export.pdf') }}" class="rounded-lg bg-rose-600 px-3 py-2 text-xs font-semibold text-white hover:bg-rose-700">Export PDF</a>
-                    </div>
-                @endif
+                <a href="{{ route('members.create') }}" class="inline-flex items-center justify-center rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800">
+                    + Tambah Jemaat
+                </a>
             </div>
         </div>
     </div>
 
-    <div class="rounded-2xl border border-[#1d4ed8] bg-[#1e40af] p-5 text-white shadow-sm">
+    <div class="rounded-2xl border border-[#1d4ed8]/20 bg-[#eff6ff] p-5 text-slate-800 shadow-sm">
         <div class="flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-start gap-3">
-                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/20 text-lg">ℹ️</div>
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-lg">🔔</div>
                 <div>
                     <h3 class="text-lg font-semibold">Verifikasi Jemaat Baru</h3>
-                    <p class="mt-1 text-sm text-blue-100">Ada {{ $pendingRegistrationsCount }} pendaftaran baru yang perlu diverifikasi oleh administrator.</p>
+                    <p class="mt-1 text-sm text-slate-600">Ada {{ $pendingRegistrationsCount }} pendaftaran baru yang menunggu persetujuan.</p>
                 </div>
             </div>
             @if(auth()->user()?->hasPermission('view_users'))
-                <a href="{{ route('members.verification.index') }}" class="rounded-lg bg-white px-3 py-2 text-sm font-semibold text-[#1e40af] hover:bg-slate-100">Lihat Antrean</a>
+                <a href="{{ route('members.verification.index') }}" class="rounded-lg bg-[#1e40af] px-3 py-2 text-sm font-semibold text-white hover:bg-[#1d4ed8]">Mulai Verifikasi</a>
             @endif
         </div>
     </div>
-    <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-        <form method="get" class="grid gap-2 md:grid-cols-7">
-            <input type="hidden" name="search" value="{{ request('search') }}">
-            <select class="rounded-lg border border-slate-200 px-3 py-2 text-sm" name="status">
-                <option value="">Semua Status</option>
-                <option value="aktif" @selected(request('status') === 'aktif')>Aktif</option>
-                <option value="tidak_aktif" @selected(request('status') === 'tidak_aktif')>Non-aktif</option>
-                <option value="pindah" @selected(request('status') === 'pindah')>Pindah</option>
-            </select>
-            <select class="rounded-lg border border-slate-200 px-3 py-2 text-sm" name="age_category">
-                <option value="">Semua Kategori Umur</option>
-                <option value="bayi" @selected(request('age_category') === 'bayi')>Bayi</option>
-                <option value="anak" @selected(request('age_category') === 'anak')>Anak</option>
-                <option value="remaja" @selected(request('age_category') === 'remaja')>Remaja</option>
-                <option value="dewasa" @selected(request('age_category') === 'dewasa')>Dewasa</option>
-                <option value="lansia" @selected(request('age_category') === 'lansia')>Lansia</option>
-            </select>
-            <select class="rounded-lg border border-slate-200 px-3 py-2 text-sm" name="gender">
-                <option value="">Semua Jenis Kelamin</option>
-                <option value="L" @selected(request('gender') === 'L')>Laki-laki</option>
-                <option value="P" @selected(request('gender') === 'P')>Perempuan</option>
-            </select>
-            <select class="rounded-lg border border-slate-200 px-3 py-2 text-sm" name="year">
-                <option value="">Semua Tahun</option>
-                @foreach($yearOptions as $yearOption)
-                    <option value="{{ $yearOption }}" @selected((string) request('year') === (string) $yearOption)>{{ $yearOption }}</option>
-                @endforeach
-            </select>
-            @if(! empty($wilayahField))
-                <select class="rounded-lg border border-slate-200 px-3 py-2 text-sm" name="wilayah">
-                    <option value="">Semua {{ $wilayahField === 'kelompok' ? 'Kelompok' : 'Wilayah' }}</option>
-                    @foreach($wilayahOptions as $wilayahOption)
-                        <option value="{{ $wilayahOption }}" @selected(request('wilayah') === $wilayahOption)>{{ $wilayahOption }}</option>
-                    @endforeach
-                </select>
-            @endif
-            <button class="rounded-lg bg-[#3b82f6] px-3 py-2 text-sm font-semibold text-white hover:bg-[#2563eb]">Filter</button>
-            <a href="{{ route('members.index') }}" class="rounded-lg border border-slate-200 px-3 py-2 text-center text-sm font-semibold text-slate-600 hover:bg-slate-50">Reset</a>
-        </form>
-        <div class="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-slate-100 pt-3">
-            <p class="text-sm font-medium text-slate-600">Menampilkan {{ $members->count() }} jemaat</p>
-            @if(auth()->user()?->hasPermission('export_members'))
-                <a href="{{ route('members.export.excel', request()->only(['search', 'status', 'age_category', 'gender', 'year', 'wilayah'])) }}" class="rounded-lg bg-emerald-600 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-700">Export Excel</a>
-            @endif
-        </div>
+
+    <p class="text-sm text-slate-600">Menampilkan <span class="font-semibold">{{ $members->total() }}</span> total jemaat terdaftar</p>
+
+    <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <table class="min-w-full text-sm">
+            <thead class="bg-slate-50 text-slate-600">
+                <tr>
+                    <th class="px-4 py-3 text-left font-semibold">NAMA LENGKAP</th>
+                    <th class="px-4 py-3 text-left font-semibold">ALAMAT DOMISILI</th>
+                    <th class="px-4 py-3 text-left font-semibold">STATUS</th>
+                    <th class="px-4 py-3 text-left font-semibold">TERDAFTAR</th>
+                    <th class="px-4 py-3 text-left font-semibold">KELOLA</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($members as $member)
+                    @php
+                        $statusClass = match ($member->status) {
+                            'aktif' => 'bg-emerald-100 text-emerald-700',
+                            'tidak_aktif' => 'bg-slate-100 text-slate-700',
+                            'pindah' => 'bg-amber-100 text-amber-700',
+                            default => 'bg-indigo-100 text-indigo-700',
+                        };
+                        $statusLabel = match ($member->status) {
+                            'aktif' => 'Jemaat Aktif',
+                            'tidak_aktif' => 'Jemaat Pasif',
+                            'pindah' => 'Pindah',
+                            default => ucfirst(str_replace('_', ' ', $member->status)),
+                        };
+                        $initials = \\Illuminate\\Support\\Str::of($member->nama)
+                            ->explode(' ')
+                            ->filter()
+                            ->take(2)
+                            ->map(fn (string $part) => \\Illuminate\\Support\\Str::upper(\\Illuminate\\Support\\Str::substr($part, 0, 1)))
+                            ->join('');
+                    @endphp
+                    <tr class="border-b border-slate-100 hover:bg-slate-50">
+                        <td class="px-4 py-4">
+                            <div class="flex items-center gap-3">
+                                <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">
+                                    {{ $initials }}
+                                </span>
+                                <div>
+                                    <p class="font-semibold text-slate-800">{{ $member->nama }}</p>
+                                    <p class="text-xs text-slate-500">{{ $member->email ?? 'Email tidak tersedia' }}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-4 py-4 text-slate-600">{{ $member->alamat }}</td>
+                        <td class="px-4 py-4">
+                            <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $statusClass }}">{{ $statusLabel }}</span>
+                        </td>
+                        <td class="px-4 py-4 text-slate-600">{{ $member->created_at?->format('d M Y') ?? '-' }}</td>
+                        <td class="px-4 py-4">
+                            <div class="flex flex-wrap gap-2">
+                                <a class="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-100" href="{{ route('members.show', $member) }}">Lihat</a>
+                                <a class="rounded-lg bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-100" href="{{ route('members.edit', $member) }}">Edit</a>
+                                @if(auth()->user()?->hasRole(['Admin', 'Super Admin', 'Staff']))
+                                    <button
+                                        type="button"
+                                        class="open-status-modal rounded-lg bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-100"
+                                        data-member-id="{{ $member->id }}"
+                                        data-member-name="{{ $member->nama }}"
+                                        data-member-status="{{ $member->status }}"
+                                        data-update-url="{{ route('members.update-status', $member) }}"
+                                    >
+                                        Ubah Status
+                                    </button>
+                                @endif
+                                <form action="{{ route('members.destroy', $member) }}" method="post" class="inline">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="rounded-lg bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700 hover:bg-rose-100" onclick="return confirm('Hapus data?')">Hapus</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="5" class="px-4 py-8 text-center text-slate-500">Belum ada data jemaat.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
     </div>
+
+    <div class="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">{{ $members->links() }}</div>
 
     <form method="post" enctype="multipart/form-data" action="{{ route('members.import') }}" class="flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
         @csrf
         <input type="file" name="file" class="w-full text-sm md:w-auto" required>
         <button class="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-700">Import File</button>
     </form>
-
-    <div class="space-y-3">
-        @forelse($members as $member)
-            @php
-                $umur = \Illuminate\Support\Carbon::parse($member->tanggal_lahir)->age;
-                $kategoriUmur = match (true) {
-                    $umur <= 2 => 'Bayi',
-                    $umur <= 12 => 'Anak',
-                    $umur <= 18 => 'Remaja',
-                    $umur <= 59 => 'Dewasa',
-                    default => 'Lansia',
-                };
-                $statusClass = match ($member->status) {
-                    'aktif' => 'bg-emerald-100 text-emerald-700',
-                    'tidak_aktif' => 'bg-slate-100 text-slate-700',
-                    'pindah' => 'bg-amber-100 text-amber-700',
-                    default => 'bg-indigo-100 text-indigo-700',
-                };
-                $genderClass = $member->jenis_kelamin === 'P'
-                    ? 'bg-rose-100 text-rose-700'
-                    : 'bg-cyan-100 text-cyan-700';
-                $initials = \Illuminate\Support\Str::of($member->nama)
-                    ->explode(' ')
-                    ->filter()
-                    ->take(2)
-                    ->map(fn (string $part) => \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($part, 0, 1)))
-                    ->join('');
-            @endphp
-            <div class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-                <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                    <div class="flex items-start gap-3">
-                        <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700">
-                            {{ $initials }}
-                        </div>
-                        <div class="space-y-1">
-                            <h3 class="text-base font-semibold text-slate-900">{{ $member->nama }}</h3>
-                            <p class="text-sm text-slate-600">{{ $member->email ?? 'Email tidak tersedia' }}</p>
-                            <p class="text-sm text-slate-600">{{ $member->kontak }}</p>
-                            <p class="text-sm text-slate-500">{{ $member->alamat }}</p>
-                            <div class="flex flex-wrap gap-1">
-                                <span class="rounded-full bg-indigo-100 px-2 py-1 text-xs font-semibold text-indigo-700">{{ $kategoriUmur }}</span>
-                                <span class="rounded-full px-2 py-1 text-xs font-semibold {{ $genderClass }}">{{ $member->jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan' }}</span>
-                                @if(! empty($wilayahField) && ! empty($member->{$wilayahField}))
-                                    <span class="rounded-full bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-700">{{ $member->{$wilayahField} }}</span>
-                                @endif
-                            </div>
-                        </div>
-                    </div>
-                    <div class="space-y-2 md:text-right">
-                        <span class="inline-flex rounded-full px-2 py-1 text-xs font-semibold {{ $statusClass }}">
-                            {{ $member->status === 'tidak_aktif' ? 'Non-aktif' : ucfirst(str_replace('_', ' ', $member->status)) }}
-                        </span>
-                        <p class="text-xs text-slate-500">Diperbarui {{ $member->updated_at?->format('d M Y') }}</p>
-                        <div class="flex flex-wrap gap-2 md:justify-end">
-                            <a class="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-100" href="{{ route('members.show', $member) }}">Lihat</a>
-                            <a class="rounded-lg bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-100" href="{{ route('members.edit', $member) }}">Edit</a>
-                            @if(auth()->user()?->hasRole(['Admin', 'Super Admin', 'Staff']))
-                                <button
-                                    type="button"
-                                    class="open-status-modal rounded-lg bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-100"
-                                    data-member-id="{{ $member->id }}"
-                                    data-member-name="{{ $member->nama }}"
-                                    data-member-status="{{ $member->status }}"
-                                    data-update-url="{{ route('members.update-status', $member) }}"
-                                >
-                                    Ubah Status
-                                </button>
-                            @endif
-                            <form action="{{ route('members.destroy', $member) }}" method="post" class="inline">
-                                @csrf
-                                @method('DELETE')
-                                <button class="rounded-lg bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700 hover:bg-rose-100" onclick="return confirm('Hapus data?')">Hapus</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @empty
-            <div class="rounded-2xl bg-white p-6 text-center text-slate-500 shadow-sm">Belum ada data jemaat.</div>
-        @endforelse
-    </div>
-    <div class="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">{{ $members->links() }}</div>
 </div>
 
 @if(auth()->user()?->hasRole(['Admin', 'Super Admin', 'Staff']))
