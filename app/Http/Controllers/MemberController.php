@@ -42,6 +42,7 @@ class MemberController extends Controller
 
         $members = Member::query()
             ->filterCategories($filters)
+            ->with('user')
             ->latest()
             ->paginate(10)
             ->withQueryString();
