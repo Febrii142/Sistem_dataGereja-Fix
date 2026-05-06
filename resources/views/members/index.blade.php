@@ -47,6 +47,7 @@
         <table class="min-w-full text-sm">
             <thead class="bg-slate-50 text-slate-600">
                 <tr>
+                    <th class="px-4 py-3 text-left font-semibold">NO</th>
                     <th class="px-4 py-3 text-left font-semibold">NAMA LENGKAP</th>
                     <th class="px-4 py-3 text-left font-semibold">ALAMAT DOMISILI</th>
                     <th class="px-4 py-3 text-left font-semibold">STATUS</th>
@@ -75,8 +76,10 @@
                             ->take(2)
                             ->map(fn (string $part) => \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($part, 0, 1)))
                             ->join('');
+                        $rowNumber = ($members->firstItem() ?? 0) + $loop->index;
                     @endphp
                     <tr class="border-b border-slate-100 hover:bg-slate-50">
+                        <td class="px-4 py-4 font-semibold text-slate-500">{{ $rowNumber }}</td>
                         <td class="px-4 py-4">
                             <div class="flex items-center gap-3">
                                 <span class="inline-flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">
@@ -119,7 +122,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="px-4 py-8 text-center text-slate-500">Belum ada data jemaat.</td>
+                        <td colspan="6" class="px-4 py-8 text-center text-slate-500">Belum ada data jemaat.</td>
                     </tr>
                 @endforelse
             </tbody>
