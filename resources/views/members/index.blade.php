@@ -77,6 +77,7 @@
                             ->map(fn (string $part) => \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($part, 0, 1)))
                             ->join('');
                         $rowNumber = ($members->firstItem() ?? 0) + $loop->index;
+                        $isApproved = ! $member->user || $member->user->status === 'approved';
                     @endphp
                     <tr class="border-b border-slate-100 hover:bg-slate-50">
                         <td class="px-4 py-4 font-semibold text-slate-500">{{ $rowNumber }}</td>
@@ -97,27 +98,31 @@
                         </td>
                         <td class="px-4 py-4 text-slate-600">{{ $member->created_at?->format('d M Y') ?? '-' }}</td>
                         <td class="px-4 py-4">
-                            <div class="flex flex-wrap gap-2">
-                                <a class="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-100" href="{{ route('members.show', $member) }}">Lihat</a>
-                                <a class="rounded-lg bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-100" href="{{ route('members.edit', $member) }}">Edit</a>
-                                @if(auth()->user()?->hasRole(['Admin', 'Super Admin', 'Staff']))
-                                    <button
-                                        type="button"
-                                        class="open-status-modal rounded-lg bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-100"
-                                        data-member-id="{{ $member->id }}"
-                                        data-member-name="{{ $member->nama }}"
-                                        data-member-status="{{ $member->status }}"
-                                        data-update-url="{{ route('members.update-status', $member) }}"
-                                    >
-                                        Ubah Status
-                                    </button>
-                                @endif
-                                <form action="{{ route('members.destroy', $member) }}" method="post" class="inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="rounded-lg bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700 hover:bg-rose-100" onclick="return confirm('Hapus data?')">Hapus</button>
-                                </form>
-                            </div>
+                            @if($isApproved)
+                                <div class="flex flex-wrap gap-2">
+                                    <a class="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-100" href="{{ route('members.show', $member) }}">Lihat</a>
+                                    <a class="rounded-lg bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-700 hover:bg-amber-100" href="{{ route('members.edit', $member) }}">Edit</a>
+                                    @if(auth()->user()?->hasRole(['Admin', 'Super Admin', 'Staff']))
+                                        <button
+                                            type="button"
+                                            class="open-status-modal rounded-lg bg-indigo-50 px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-100"
+                                            data-member-id="{{ $member->id }}"
+                                            data-member-name="{{ $member->nama }}"
+                                            data-member-status="{{ $member->status }}"
+                                            data-update-url="{{ route('members.update-status', $member) }}"
+                                        >
+                                            Ubah Status
+                                        </button>
+                                    @endif
+                                    <form action="{{ route('members.destroy', $member) }}" method="post" class="inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="rounded-lg bg-rose-50 px-3 py-1.5 text-xs font-semibold text-rose-700 hover:bg-rose-100" onclick="return confirm('Hapus data?')">Hapus</button>
+                                    </form>
+                                </div>
+                            @else
+                                <span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">Menunggu Verifikasi</span>
+                            @endif
                         </td>
                     </tr>
                 @empty
