@@ -15,6 +15,7 @@ use App\Http\Controllers\RegistrationController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\Admin\FamilyController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/dashboard');
@@ -74,6 +75,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/members-export/pdf', [MemberController::class, 'exportPdf'])
         ->middleware('permission:export_members')
         ->name('members.export.pdf');
+
+    Route::prefix('families')
+        ->name('families.')
+        ->middleware('permission:view_members')
+        ->group(function () {
+            Route::get('/', [FamilyController::class, 'index'])->name('index');
+        });
 
     Route::prefix('admin/registrations')
         ->middleware('permission:view_users')
